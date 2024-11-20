@@ -1,18 +1,16 @@
 // Vendor
 import {
   ACESFilmicToneMapping,
-  BasicShadowMap,
   CineonToneMapping,
   Color,
   LinearToneMapping,
   NoToneMapping,
   ReinhardToneMapping,
   SRGBColorSpace,
-  sRGBEncoding,
-  WebGL1Renderer,
-  WebGLRenderer,
 } from 'three'
-import WebGL from 'three/addons/capabilities/WebGL.js'
+import { WebGPURenderer } from 'three/tsl'
+
+// import WebGPU from 'three/addons/capabilities/WebGPU.js'
 
 // Configs
 // import globalConfig from '@/js/webgl/configs/global'
@@ -59,13 +57,19 @@ export default class Renderer {
    * Private
    */
   _createRenderer() {
-    const RendererClass = WebGL.isWebGL2Available() ? WebGLRenderer : WebGL1Renderer
-    const renderer = new RendererClass({
+    // this.isWebGPU = WebGPU.isAvailable()
+    // console.log(WebGPU)
+
+    		// Currently sortObjects and perObjectFrustumCulled currently have bugs in WebGPU so disabled it.
+		// sortObjects.value = true//!this.isWebGPU
+		// perObjectFrustumCulled.value = true// !this.isWebGPU
+
+    const renderer = new WebGPURenderer({
       canvas: this.#canvas,
-      antialias: false,
+      antialias: true,
       powerPreference: 'high-performance',
     })
-
+    renderer.init()
     const clearColor = new Color(0xffffff)
     const clearAlpha = 1
     renderer.setClearColor(clearColor, clearAlpha)
@@ -89,7 +93,6 @@ export default class Renderer {
         CineonToneMapping,
         ACESFilmicToneMapping,
       }
-      console.log(this.#debug)
       this.#debug.addBinding(props, 'clearColor').on('change', () => {
         renderer.setClearColor(new Color(props.clearColor), clearAlpha)
       })

@@ -4,7 +4,7 @@ import * as path from 'path'
 
 export default defineConfig({
   root: 'src',
-  base: '/vite-threejs-project-template/', // for Github pages, otherwise use './'
+  base: '/christmas-xp-world-bending/', // for Github pages, otherwise use './'
   build: {
     outDir: '../dist',
   },

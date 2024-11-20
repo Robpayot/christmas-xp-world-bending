@@ -1,5 +1,5 @@
 // Test import of a JavaScript module
-import WebGLApp from './WebGLApp'
+import WebGPUApp from './WebGPUApp'
 import LoaderManager from './managers/LoaderManager'
 import Settings from './utils/Settings'
 import config from './views/config';
@@ -13,5 +13,5 @@ import config from './views/config';
 
   const canvas = document.querySelector('.scene')
 
-  new WebGLApp({ canvas, isDevelopment: true })
+  new WebGPUApp({ canvas, isDevelopment: true })
 })()

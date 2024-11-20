@@ -1,8 +1,6 @@
 // Vendor
 import { gsap } from 'gsap'
-import Stats from 'stats-js'
 import { Clock } from 'three'
-import { GPUStatsPanel } from 'three/addons/utils/GPUStatsPanel'
 
 // Modules
 import Debugger from '@/js/managers/Debugger'
@@ -13,8 +11,9 @@ import Renderer from '@/js/components/Renderer'
 import MainView from './views/MainView'
 import Settings from './utils/Settings'
 import LoaderManager from './managers/LoaderManager'
+import Stats from 'stats.js'
 
-export default class WebGLApp {
+export default class WebGPUApp {
   #canvas
   #isDevelopment
   #isViewRenderingEnabled
@@ -49,7 +48,6 @@ export default class WebGLApp {
 
     if (this.#isDevelopment) {
       this.#stats = this._createStats()
-      this.#statsGpuPanel = this._createStatsGpuPanel()
     }
 
     this._initViews()
@@ -91,15 +89,7 @@ export default class WebGLApp {
   _start() {
     // this.#composer.setup()
     // this.#activeView.setup()
-    this._startStatsGpuQuery()
-  }
-
-  _startStatsGpuQuery() {
-    if (this.#isDevelopment) {
-      setTimeout(() => {
-        this.#isStatsGpuQueryStarted = true
-      }, 2000)
-    }
+    // this._startStatsGpuQuery()
   }
 
   _initViews() {
@@ -118,21 +108,14 @@ export default class WebGLApp {
     // precompile textures
     const textures = LoaderManager.textures
     textures.forEach((texture) => {
-      this.#renderer.instance.initTexture(texture)
+      // this.#renderer.instance.initTexture(texture)
     })
   }
 
   _createStats() {
     const stats = new Stats()
-    document.body.appendChild(stats.dom)
+    // document.body.appendChild(stats.dom)
     return stats
-  }
-
-  _createStatsGpuPanel() {
-    const panel = new GPUStatsPanel(this.#renderer.instance.getContext())
-    this.#stats.addPanel(panel)
-    // this.#stats.showPanel(3);
-    return panel
   }
 
   _removeStats() {
@@ -171,7 +154,7 @@ export default class WebGLApp {
     this.#stats?.end()
 
     // if (this.#isDevelopment && this.#renderer) this.#renderer.instance.info.reset()
-    if (this.#renderer) this.#renderer.instance.info.reset()
+    // if (this.#renderer) this.#renderer.instance.info.reset()
     // R.P.: Continue to reset info in production to fix an issue using webworkers
   }
 
