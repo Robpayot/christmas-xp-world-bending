@@ -1,6 +1,18 @@
 {
 	"parser": "@babel/eslint-parser",
+	"plugins": ["@stylistic", "@stylistic/js"],
 	"rules": {
+		"@stylistic/indent": ["error", "tab"],
+		"@stylistic/js/semi": ["error", "never"],
+		"@stylistic/js/key-spacing": ["error", { "beforeColon": false, "afterColon": true }],
+		"@stylistic/js/space-infix-ops": ["error", { "int32Hint": false }],
+		"@stylistic/js/comma-spacing": ["error", { "before": false, "after": true }],
+		"@stylistic/js/array-bracket-spacing": ["error", "never"],
+		"@stylistic/js/arrow-spacing": "error",
+		"@stylistic/space-before-blocks": ["error", "always"],
+		"@stylistic/object-curly-spacing": ["error", "always"],
+		"@stylistic/space-in-parens": ["error", "never"],
+		"@stylistic/no-multiple-empty-lines": ["error", { "max": 1, "maxEOF": 0 }],
 		"prefer-template": "off",
 		"no-var": 1,
 		"no-unused-vars": 1,

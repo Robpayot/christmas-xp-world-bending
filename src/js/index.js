@@ -2,16 +2,16 @@
 import WebGPUApp from './WebGPUApp'
 import LoaderManager from './managers/LoaderManager'
 import Settings from './utils/Settings'
-import config from './views/config';
+import config from './views/config'
 
 ;(async () => {
-  // Preload assets before initiating the scene
+	// Preload assets before initiating the scene
 
-  // scene
-  await Settings.init()
-  await LoaderManager.load([...config.resources])
+	// scene
+	await Settings.init()
+	await LoaderManager.load([...config.resources])
 
-  const canvas = document.querySelector('.scene')
+	const canvas = document.querySelector('.scene')
 
-  new WebGPUApp({ canvas, isDevelopment: true })
+	new WebGPUApp({ canvas, isDevelopment: true })
 })()
