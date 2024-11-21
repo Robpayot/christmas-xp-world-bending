@@ -11,6 +11,8 @@ import CameraManager from '../managers/CameraManager'
 import OrbitCamera from '../cameras/OrbitCamera'
 import settings from './settings'
 
+import { modelViewProjection, uniform, vec4, mix, normalWorld, color, smoothstep, Fn, If, vec3, sin, abs, float, Color } from 'three/tsl'
+
 export default class MainView {
   #config
   #cameraManager
@@ -34,6 +36,19 @@ export default class MainView {
 
     // After loading
     this.#components = this._createComponents()
+
+    const uRange = uniform(1)
+    const uColorE = new Color('#C561B3')
+    const uColorF = new Color('#1D0010')
+
+    this.#scene.backgroundNode = Fn(() => {
+			const rangeY = normalWorld.smoothstep(uRange.mul(-1), uRange).sub(0.5).mul(2).abs()
+			const result = vec3().toVar()
+
+    result.rgb = mix(uColorE, uColorF, smoothstep(0.7, 1, rangeY))
+
+			return result
+		})()
   }
 
   destroy() {

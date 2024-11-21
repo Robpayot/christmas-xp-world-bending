@@ -48,6 +48,7 @@ export default class WebGPUApp {
 
     if (this.#isDevelopment) {
       this.#stats = this._createStats()
+      console.log(this.#stats)
     }
 
     this._initViews()
@@ -114,7 +115,7 @@ export default class WebGPUApp {
 
   _createStats() {
     const stats = new Stats()
-    // document.body.appendChild(stats.dom)
+    document.body.appendChild(stats.dom)
     return stats
   }
 

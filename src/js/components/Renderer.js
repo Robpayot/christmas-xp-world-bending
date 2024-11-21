@@ -60,7 +60,7 @@ export default class Renderer {
     // this.isWebGPU = WebGPU.isAvailable()
     // console.log(WebGPU)
 
-    		// Currently sortObjects and perObjectFrustumCulled currently have bugs in WebGPU so disabled it.
+    // Currently sortObjects and perObjectFrustumCulled currently have bugs in WebGPU so disabled it.
 		// sortObjects.value = true//!this.isWebGPU
 		// perObjectFrustumCulled.value = true// !this.isWebGPU
 
@@ -142,7 +142,7 @@ export default class Renderer {
     memory.addBinding(this.#instance.info.memory, 'geometries', { readonly: true })
     memory.addBinding(this.#instance.info.memory, 'textures', { readonly: true })
     const render = stats.addFolder({ title: 'Render' })
-    render.addBinding(this.#instance.info.render, 'calls', { readonly: true })
+    render.addBinding(this.#instance.info.render, 'drawCalls', { readonly: true })
     render.addBinding(this.#instance.info.render, 'triangles', { readonly: true })
     render.addBinding(this.#instance.info.render, 'points', { readonly: true })
     render.addBinding(this.#instance.info.render, 'lines', { readonly: true })
