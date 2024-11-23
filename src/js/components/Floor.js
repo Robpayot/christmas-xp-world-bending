@@ -2,6 +2,7 @@ import { Mesh, MeshBasicMaterial, MeshMatcapMaterial, Object3D, PlaneGeometry, T
 import LoaderManager from '@/js/managers/LoaderManager'
 import BendManager from '../managers/BendManager'
 import { MeshNormalNodeMaterial, MeshStandardNodeMaterial } from 'three/webgpu'
+import { vertexBendSphereNode } from '../tsl/utils'
 
 const GEOMETRY = new PlaneGeometry(BendManager.radius, BendManager.radius, 32, 32)
 GEOMETRY.rotateX(-Math.PI / 2)
@@ -26,6 +27,8 @@ export default class Floor extends Object3D {
 
 	_createMaterial() {
 		this.material = new MeshNormalNodeMaterial({ wireframe: true })
+
+		this.material.vertexNode = vertexBendSphereNode()
 		// this.material = new MeshBasicMaterial({ color:'red' })
 	}
 
