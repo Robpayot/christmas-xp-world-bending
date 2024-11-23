@@ -6,42 +6,61 @@ import Debugger from '@/js/managers/Debugger'
 
 // Cameras
 import MainCamera from '../cameras/MainCamera'
-import SphereComponent from '../components/ComponentSphere/'
+import Sphere from '../components/Sphere'
 import CameraManager from '../managers/CameraManager'
 import OrbitCamera from '../cameras/OrbitCamera'
 import settings from './settings'
 
-import { modelViewProjection, uniform, vec4, mix, normalWorld, color, smoothstep, Fn, If, vec3, sin, abs, float, Color } from 'three/tsl'
+import {
+	modelViewProjection,
+	uniform,
+	vec4,
+	mix,
+	normalWorld,
+	color,
+	smoothstep,
+	Fn,
+	If,
+	vec3,
+	sin,
+	abs,
+	float,
+	Color,
+} from 'three/tsl'
+import Floor from '../components/Floor'
 
 export default class MainView {
-	#config
-	#cameraManager
-	#scene
-	#renderer
-	#components
-	#debugFolder
+	config
+	cameraManager
+	scene
+	renderer
+	components
+	debugFolder
 	constructor({ config, renderer }) {
 		// Options
-		this.#config = config
-		this.#renderer = renderer
+		this.config = config
+		this.renderer = renderer
 
 		// Setup
 		// replace with LoaderManager
 		// this._resourceManager = this._createResourceManager()
-		this.#scene = this._createScene()
-		this.#cameraManager = this._createCameraManager()
-		this.#components = null
+		this.scene = this._createScene()
+		this.cameraManager = this._createCameraManager()
+		this.components = null
 
-		this.#debugFolder = this._createDebugFolder()
+		this.debugFolder = this._createDebugFolder()
 
 		// After loading
-		this.#components = this._createComponents()
+		this.components = this._createComponents()
+
+		// update renderOrders
+		// this._updateRenderOrder()
 
 		const uRange = uniform(1)
 		const uColorE = new Color('#C561B3')
 		const uColorF = new Color('#1D0010')
 
-		this.#scene.backgroundNode = Fn(() => {
+		this.scene.backgroundNode = Fn(() => {
 			const rangeY = normalWorld.smoothstep(uRange.mul(-1), uRange).sub(0.5).mul(2).abs()
 			const result = vec3().toVar()
 
@@ -56,22 +75,22 @@ export default class MainView {
 	}
 
 	/**
-   * Getters & Setters
-   */
+	 * Getters & Setters
+	 */
 	get scene() {
-		return this.#scene
+		return this.scene
 	}
 
 	get camera() {
-		return this.#cameraManager?.active?.instance
+		return this.cameraManager?.active?.instance
 	}
 
 	/**
-   * Private
-   */
+	 * Private
+	 */
 	_createResourceManager() {
 		// const resourceManager = new ResourceManager({
-		//   namespace: this.#config.name,
+		//   namespace: this.config.name,
 		// })
 		// return resourceManager
 	}
@@ -83,9 +102,9 @@ export default class MainView {
 
 	_createCameraManager() {
 		const cameraManager = new CameraManager({
-			scene: this.#scene,
-			config: this.#config,
-			renderer: this.#renderer,
+			scene: this.scene,
+			config: this.config,
+			renderer: this.renderer,
 			cameras: [
 				{
 					name: 'default',
@@ -106,61 +125,83 @@ export default class MainView {
 	}
 
 	/**
-   * Components
-   */
+	 * Components
+	 */
 	_createComponents() {
 		const components = {}
-		// this.#scene.add(ResourceLoader.get('watercolor/scene').scene)
-		components.sphere = this._createSphereComponent()
+		// this.scene.add(ResourceLoader.get('watercolor/scene').scene)
+		components.sphere = this._createSphere()
+		components.floor = this._createFloor()
 		return components
 	}
 
-	_createSphereComponent() {
-		const component = new SphereComponent({
-			config: this.#config,
-			debug: this.#debugFolder,
+	_createSphere() {
+		const component = new Sphere({
+			config: this.config,
+			debug: this.debugFolder,
 		})
 
-		this.#scene.add(component)
+		this.scene.add(component)
 
 		return component
 	}
 
+	_createFloor() {
+		const component = new Floor({
+			config: this.config,
+			debug: this.debugFolder,
+		})
+
+		this.scene.add(component)
+
+		return component
+	}
 	_destroyComponents() {
-		if (!this.#components) return
-		for (const key in this.#components) {
-			if (typeof this.#components[key].destroy === 'function') this.#components[key].destroy()
+		if (!this.components) return
+		for (const key in this.components) {
+			if (typeof this.components[key].destroy === 'function') this.components[key].destroy()
 		}
 	}
 
 	/**
-   * Update
-   */
+	 * Update
+	 */
 	update({ time, delta }) {
 		this._updateComponents({ time, delta })
-		this.#cameraManager.update({ time, delta })
+		this.cameraManager.update({ time, delta })
 	}
 
 	_updateComponents({ time, delta }) {
 		let component
-		for (const key in this.#components) {
-			component = this.#components[key]
+		for (const key in this.components) {
+			component = this.components[key]
 			if (typeof component.update === 'function') {
 				component.update({ time, delta })
 			}
 		}
 	}
 
+	_updateRenderOrder = () => {
+		// limited overdraw
+		const renderOrders = [this.components.sphere]
+
+		for (const renderOrder of renderOrders) {
+			if (renderOrder) {
+				renderOrder.renderOrder = renderOrders.indexOf(renderOrder)
+			}
+		}
+	}
+
 	/**
-   * Resize
-   */
+	 * Resize
+	 */
 	resize({ width, height }) {
-		this.#cameraManager.resize({ width, height })
+		this.cameraManager.resize({ width, height })
 
 		// resize components
 		let component
-		for (const key in this.#components) {
-			component = this.#components[key]
+		for (const key in this.components) {
+			component = this.components[key]
 			if (typeof component.resize === 'function') {
 				component.resize({ width, height })
 			}
@@ -168,12 +209,12 @@ export default class MainView {
 	}
 
 	/**
-   * Debug
-   */
+	 * Debug
+	 */
 	_createDebugFolder() {
 		if (!Debugger) return
 
-		const debugFolder = Debugger.addFolder({ title: `Scene ${this.#config.name}`, expanded: true })
+		const debugFolder = Debugger.addFolder({ title: `Scene ${this.config.name}`, expanded: true })
 
 		// Debugger.on('save', () => {
 		//   Debugger.save(settings, settings.file).then((e) => {

@@ -39,23 +39,23 @@ export default class Renderer {
 	}
 
 	/**
-   * Getters & Setters
-   */
+	 * Getters & Setters
+	 */
 	get instance() {
 		return this.#instance
 	}
 
 	/**
-   * Public
-   */
+	 * Public
+	 */
 	updateStats() {
 		Debugger?.pane.refresh()
 		this.#instance.info.reset()
 	}
 
 	/**
-   * Private
-   */
+	 * Private
+	 */
 	_createRenderer() {
 		// this.isWebGPU = WebGPU.isAvailable()
 		// console.log(WebGPU)
@@ -104,30 +104,30 @@ export default class Renderer {
 	}
 
 	/**
-   * Render
-   */
+	 * Render
+	 */
 	render(scene, camera) {
-		this.#instance.render(scene, camera)
+		this.#instance.renderAsync(scene, camera) // might cause issues?
 	}
 
 	/**
-   * Resize
-   */
+	 * Resize
+	 */
 	resize({ width, height, dpr }) {
 		this.#instance.setPixelRatio(dpr)
 		this.#instance.setSize(width, height)
 	}
 
 	/**
-   * Handlers
-   */
+	 * Handlers
+	 */
 	onExposureChange(exposure) {
 		this.#instance.toneMappingExposure = exposure
 	}
 
 	/**
-   * Debug
-   */
+	 * Debug
+	 */
 	_createDebug() {
 		if (!Debugger) return
 
@@ -137,6 +137,7 @@ export default class Renderer {
 
 	_createDebugStats() {
 		if (!this.#debug) return
+
 		const stats = this.#debug.addFolder({ title: 'Stats' })
 		const memory = stats.addFolder({ title: 'Memory' })
 		memory.addBinding(this.#instance.info.memory, 'geometries', { readonly: true })
