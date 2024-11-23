@@ -1,0 +1,40 @@
+{
+	"editor.inlineSuggest.enabled": true,
+	"settingsSync.ignoredExtensions": [],
+	"settingsSync.ignoredSettings": [],
+	"editor.formatOnSave": true,
+	"editor.formatOnType": false,
+	"editor.codeActionsOnSave": ["source.fixAll"],
+	"eslint.codeActionsOnSave.mode": "all",
+	"eslint.validate": ["javascript", "javascriptreact", "typescript", "vue", "json", "json5"],
+	"editor.formatOnSaveMode": "file",
+	"files.autoSave": "onFocusChange",
+	"git.confirmSync": false,
+	"git.enableSmartCommit": true,
+	"javascript.updateImportsOnFileMove.enabled": "always",
+	"git.autofetch": true,
+	// "workbench.colorTheme": "Default Dark Modern",
+	"security.workspace.trust.untrustedFiles": "open",
+	"githubPullRequests.pullBranch": "never",
+	"explorer.confirmDelete": false,
+	"github.copilot.editor.enableAutoCompletions": true,
+	"eslint.format.enable": true,
+	"eslint.lintTask.enable": true,
+	"eslint.ignoreUntitled": true,
+	"editor.tabSize": 2,
+	"editor.insertSpaces": true,
+	"editor.formatOnPaste": true,
+	"diffEditor.ignoreTrimWhitespace": false,
+	"[javascript]": {
+		"editor.defaultFormatter": "dbaeumer.vscode-eslint",
+		"editor.formatOnSave": true
+	},
+	"[jsonc]": {
+		"editor.tabCompletion": "on",
+		"editor.tabSize": 2
+	},
+	"[vue]": {
+		"editor.defaultFormatter": "Vue.volar"
+	},
+	"editor.defaultFormatter": "dbaeumer.vscode-eslint"
+}
