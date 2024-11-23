@@ -9,6 +9,7 @@ class BendManager {
 	powerY = uniform(settings.powerY)
 	backY = uniform(settings.backY)
 	radius = 50
+	progress = uniform(0)
 
 	copy = () => {
 		const settings = {
@@ -34,16 +35,16 @@ class BendManager {
 
 		const debug = Debugger.addFolder({ title: 'BendManager', index: 2 })
 
-		debug.addBinding(this.powerX, 'value', { min: -200, max: 200, label: 'Power X' })
+		debug.addBinding(this.progress, 'value', { min: 0, max: 1, label: 'progress' })
 
 		// this.#debug.addButton({ title: "Reset position" }).on("click", () => {
-    //   localStorage.removeItem("camera-orbit-position")
-    //   localStorage.removeItem("camera-orbit-target")
+		//   localStorage.removeItem("camera-orbit-position")
+		//   localStorage.removeItem("camera-orbit-target")
 
-    //   this.#instance.position.copy(DEFAULT_POSITION)
-    //   this.#controls.target.set(0, 0, 0)
-    //   this.#controls.update()
-    // })
+		//   this.#instance.position.copy(DEFAULT_POSITION)
+		//   this.#controls.target.set(0, 0, 0)
+		//   this.#controls.update()
+		// })
 		// debug.addBinding(this, 'copy').name('Copy')
 		return debug
 	}

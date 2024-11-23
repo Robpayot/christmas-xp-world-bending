@@ -28,8 +28,10 @@ export const vertexBendSphereNode = () =>
 	Fn(() => {
 		const vUv = uv()
 
+		const planePosition = positionLocal.toVar()
+
 		// Map plane vertices to spherical coordinates
-		const radius = float(50)
+		const radius = float(BendManager.radius).div(2)
 		const theta = vUv.y.mul(PI) // Latitude
 		const phi = vUv.x.mul(2).mul(PI) // Longitude
 
@@ -38,9 +40,11 @@ export const vertexBendSphereNode = () =>
 		spherePosition.y = radius.mul(cos(theta))
 		spherePosition.z = radius.mul(sin(theta)).mul(sin(phi))
 
+		const finalPosition = mix(planePosition, spherePosition, BendManager.progress)
+
 		// Transform the vertex position
 		// gl_Position = projectionMatrix * modelViewMatrix * vec4(spherePosition, 1.0)
-		const transformed = modelViewMatrix.mul(spherePosition)
+		const transformed = modelViewMatrix.mul(finalPosition)
 
 		// need access positionLocal after rotation (transformations), so vertexNode is the one, not positionNode
 		// const curve = getBend(positionWorld.z, powerX, backX, powerY, backY)
