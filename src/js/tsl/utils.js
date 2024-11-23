@@ -89,21 +89,54 @@ import BendManager from "../managers/BendManager"
 // 	return vec2(xCurve, yCurve)
 // }
 
+// Increasing velocity until stop
+export function easeInCirc(t) {
+
+	const scaledTime = t / 1
+	return -1 * (Math.sqrt(1 - scaledTime * t) - 1)
+
+}
+
 // Full shaders
 export const vertexBendNode = () =>
 	// const { powerX, backX, powerY, backY } = BendManager
 	Fn(() => {
-		const worldPosZ = positionWorld.z
-		const maxDist = float(BendManager.deep)
 
-		const yposZ = worldPosZ.toVar()
-		const t1 = yposZ.sub(1)// maxDist
-		const yCurve = sqrt(float(1).sub(t1.mul(t1)))
+		// Original vertex position
+		const pos = positionWorld.toVar()
+
+		// Calculate distance from the center
+		const dist = length(pos.xz)
+		const radius = float(BendManager.radius)
+
+		// Spherical displacement (interpolate between flat and spherical)
+		// if (dist <= radius) {
+		// const theta = atan2(pos.z, pos.x) // Angle in the XZ plane
+		// const phi = mix(0.0, acos(dist.div(radius)), BendManager.progress) // Angle from Y-axis
+		// pos.x = radius.mul(sin(phi)).mul(cos(theta)) // New X position
+		// pos.y = radius.mul(cos(phi)) // New Y position
+		// pos.z = radius.mul(sin(phi)).mul(sin(theta)) // New Z position
+
+		// }
+
+		// // easeOuCirc curve
+		// const worldPosZ = positionWorld.z
+		// const maxDist = float(BendManager.deep)
+
+		// const yposZ = worldPosZ.toVar()
+		// const t1 = yposZ.sub(1)// maxDist
+		// const yCurve = sqrt(float(1).sub(t1.mul(t1)))
+
+		const scaledTime = pos.z.div(BendManager.progress)
+		// const yCurve =  float(-1).mul(sqrt(float(1).sub(scaledTime.mul(pos.z))).sub(1))
+		const zCurve = abs(pos.z.mul(pos.z.mul(BendManager.deep).mul(0.01)))
+		const xCurve = abs(pos.x.mul(pos.x.mul(BendManager.deep).mul(0.01)))
 
 		// Transform the vertex position
-		const transformed = modelViewMatrix.mul(positionLocal)
+		const transformed = modelViewMatrix.mul(pos).toVar()
+		transformed.y.addAssign(zCurve.add(xCurve).oneMinus())
 
-		const mvPosition = vec4(transformed.add(yCurve).xyz, transformed.w)
+		const mvPosition = vec4(transformed.xyz, transformed.w)
 
 		return cameraProjectionMatrix.mul(mvPosition)
 	})()

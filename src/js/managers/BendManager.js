@@ -8,9 +8,9 @@ class BendManager {
 	backX = uniform(settings.backX)
 	powerY = uniform(settings.powerY)
 	backY = uniform(settings.backY)
-	radius = 1
+	radius = 50
 	progress = uniform(0)
-	deep = uniform(1)
+	deep = uniform(1.5)
 
 	copy = () => {
 		const settings = {
@@ -37,7 +37,7 @@ class BendManager {
 		const debug = Debugger.addFolder({ title: 'BendManager', index: 2 })
 
 		debug.addBinding(this.progress, 'value', { min: 0, max: 1, label: 'progress' })
-		debug.addBinding(this.deep, 'value', { min: -100, max: 100, label: 'deep' })
+		debug.addBinding(this.deep, 'value', { min: -3, max: 3, label: 'deep' })
 
 		// this.#debug.addButton({ title: "Reset position" }).on("click", () => {
 		//   localStorage.removeItem("camera-orbit-position")
