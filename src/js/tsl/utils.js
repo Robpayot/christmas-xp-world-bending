@@ -1,6 +1,6 @@
 // Tsl function to bend
 
-import { abs, cameraProjectionMatrix, instanceIndex, normalize, modelViewMatrix, positionLocal, positionWorld, select, sqrt, vec2, vec4, InstancedInterleavedBuffer, DynamicDrawUsage, instancedDynamicBufferAttribute, instancedBufferAttribute, mat4, Fn, mat3, modelWorldMatrix, vec3, color, remap, clamp, output, mix, textureSize, textureLoad, int, ivec2, float, normalLocal, tangentLocal, drawIndex, cameraViewMatrix, modelNormalMatrix, normalWorld, sin, uv, positionView, texture, step, If, max, smoothstep, dot, cos, fract, PI, length, atan, acos, atan2 } from "three/tsl"
+import { abs, cameraProjectionMatrix, instanceIndex, normalize, modelViewMatrix, positionLocal, positionWorld, select, sqrt, vec2, vec4, InstancedInterleavedBuffer, DynamicDrawUsage, instancedDynamicBufferAttribute, instancedBufferAttribute, mat4, Fn, mat3, modelWorldMatrix, vec3, color, remap, clamp, output, mix, textureSize, textureLoad, int, ivec2, float, normalLocal, tangentLocal, drawIndex, cameraViewMatrix, modelNormalMatrix, normalWorld, sin, uv, positionView, texture, step, If, max, smoothstep, dot, cos, fract, PI, length, atan, acos, atan2, asin } from "three/tsl"
 import BendManager from "../managers/BendManager"
 
 // varying vec2 vUv;
@@ -36,11 +36,110 @@ import BendManager from "../managers/BendManager"
 // float y = cos(latRad);
 // float z = cos(latRad) * sin(lonRad);
 
+// SPHERE TO PLANE
+
+// uniform float progress; // Controls the morphing (0: full sphere, 1: flat plane)
+// uniform float sphereRadius; // The radius of the sphere
+// uniform float planeWidth; // Width of the final plane
+// uniform float planeLength; // Length of the final plane
+
+// void main() {
+//     vec3 spherePosition = position; // Start with the spherical position
+
+//     // Spherical to Cartesian Coordinates (assuming a sphere centered at (0,0,0))
+//     float latitude = asin(spherePosition.y / sphereRadius); // Latitude
+//     float longitude = atan(spherePosition.z, spherePosition.x); // Longitude
+
+//     // Interpolate towards a plane along the X-Z plane
+//     vec3 flatPosition;
+//     flatPosition.x = (longitude + 3.14159265359) / (2.0 * 3.14159265359) * planeWidth - planeWidth / 2.0; // Map longitude to X
+//     flatPosition.y = 0.0; // Flatten the Y coordinate (for the plane)
+//     flatPosition.z = (latitude + 3.14159265359 / 2.0) / 3.14159265359 * planeLength - planeLength / 2.0; // Map latitude to Z
+
+//     // Keep the top of the sphere fixed
+//     if (progress < 1.0) {
+//         flatPosition.y = spherePosition.y; // Keep top of the sphere at the same Y (North pole stays in place)
+//     }
+
+//     // Interpolate between the sphere and the flat plane based on progress
+//     vec3 finalPosition = mix(spherePosition, flatPosition, progress);
+
+//     // Apply final position
+//     gl_Position = projectionMatrix * modelViewMatrix * vec4(finalPosition, 1.0);
+// }
+
 // Full shaders
+
+// Start fast, decreasing velocity until stop
+// export function easeOutCirc( t ) {
+
+//     const t1 = t - 1;
+//     return Math.sqrt( 1 - t1 * t1 );
+
+// }
+
+// export const getBend = (worldPosZ, powerX, backX, powerY, backY) => {
+
+// 	const posZ = abs(worldPosZ).div(powerX).toVar()
+// 	const xCurve = posZ.mul(posZ).mul(backX.add(1).mul(posZ).sub(backX)).mul(-1)
+
+// 	const yposZ = abs(worldPosZ).div(powerY).toVar()
+// 	const yCurve = yposZ.mul(yposZ).mul(backY.add(1).mul(yposZ).sub(backY)).mul(-1)
+
+// 	return vec2(xCurve, yCurve)
+// }
+
+// Full shaders
+export const vertexBendNode = () =>
+	// const { powerX, backX, powerY, backY } = BendManager
+	Fn(() => {
+		const worldPosZ = positionWorld.z
+		const maxDist = float(BendManager.deep)
+
+		const yposZ = worldPosZ.toVar()
+		const t1 = yposZ.sub(1)// maxDist
+		const yCurve = sqrt(float(1).sub(t1.mul(t1)))
+
+		// Transform the vertex position
+		const transformed = modelViewMatrix.mul(positionLocal)
+
+		const mvPosition = vec4(transformed.add(yCurve).xyz, transformed.w)
+
+		return cameraProjectionMatrix.mul(mvPosition)
+	})()
+// Full shaders
+export const vertexSphereToPlaneNode = () =>
+	// const { powerX, backX, powerY, backY } = BendManager
+	Fn(() => {
+		const spherePosition = positionWorld.toVar()
+		const planeWidth = float(BendManager.radius)
+		const sphereRadius = float(BendManager.radius).div(2)
+		// Spherical to Cartesian Coordinates (assuming a sphere centered at (0,0,0))
+		const latitude = asin(spherePosition.y.div(sphereRadius))
+		const longitude = atan2(spherePosition.z, spherePosition.x) // Longitude
+
+		const flatPosition = vec3(0).toVar()
+		flatPosition.x = longitude.add(PI).div(PI.mul(2)).mul(planeWidth).sub(planeWidth.div(2)) // Map longitude to X
+		flatPosition.y = 0.0 // Flatten the Y coordinate (for the plane)
+		flatPosition.z = latitude.add(PI.div(2)).div(PI).div(planeWidth).sub(planeWidth.div(2)) // Map latitude to Z
+
+		// const morphFactor = smoothstep(0.0, float(BendManager.radius).div(2), distanceFromCenter).mul(BendManager.progress)
+		const finalPosition = mix(spherePosition, flatPosition, BendManager.progress)
+
+		// Transform the vertex position
+		// gl_Position = projectionMatrix * modelViewMatrix * vec4(spherePosition, 1.0)
+		const transformed = modelViewMatrix.mul(finalPosition)
+
+		// need access positionLocal after rotation (transformations), so vertexNode is the one, not positionNode
+		// const curve = getBend(positionWorld.z, powerX, backX, powerY, backY)
+		const mvPosition = vec4(transformed.xyz, transformed.w)
+
+		return cameraProjectionMatrix.mul(mvPosition)
+	})()
 export const vertexBendSphereNode = () =>
 	// const { powerX, backX, powerY, backY } = BendManager
 	Fn(() => {
-		const planePosition = positionLocal.toVar()
+		const planePosition = positionWorld.toVar()
 		const sphereCenter = vec3(0.0, float(BendManager.radius).div(2), 0.0)
 		const distanceFromCenter = length(planePosition.xz)
 
@@ -59,10 +158,15 @@ export const vertexBendSphereNode = () =>
 		// const theta = float(planePosition.z.div(radius)).mul(PI) // Latitude
 		// const phi = float(planePosition.x.div(radius)).mul(2).mul(PI) // Longitude
 
-		// const spherePosition = vec3(0).toVar()
-		// spherePosition.x = radius.mul(sin(theta)).mul(cos(phi))
-		// spherePosition.y = radius.mul(cos(theta))
-		// spherePosition.z = radius.mul(sin(theta)).mul(sin(phi))
+		// Map the X and Z coordinates to spherical latitude and longitude
+		const latitude =  float(positionWorld.z).div(float(BendManager.radius)).mul(PI).sub(PI.div(2))// Map Z to latitude (-pi/2 to pi/2)
+		const longitude = float(positionWorld.x).div(float(BendManager.radius)).mul(PI) // Map X to longitude (0 to pi)
+		// Calculate the spherical position
+
+		const sphericalPosition = vec3(0).toVar()
+		sphericalPosition.x = radius.mul(cos(latitude)).mul(cos(longitude))
+		sphericalPosition.y = radius.mul(sin(latitude))
+		sphericalPosition.z = radius.mul(cos(latitude)).mul(sin(longitude))
 
 		// BEND Z
 
@@ -72,13 +176,13 @@ export const vertexBendSphereNode = () =>
 
 		// Apply bending based on progress
 		const cylinderPosition = vec3(0).toVar()
-		const angle = float(positionLocal.z).div(float(BendManager.radius)).mul(2.0).mul(PI) // Map Z to an angle around the circle
+		const angle = float(positionWorld.z).div(float(BendManager.radius)).mul(2.0).mul(PI) // Map Z to an angle around the circle
 		cylinderPosition.z = centerZ.add(circleRadius.mul(sin(angle.mul(BendManager.progress)))) // Circular Z-coordinate
-		cylinderPosition.x = positionLocal.x // Keep X the same
-		cylinderPosition.y = positionLocal.y.add(circleRadius.mul((float(1.0).sub(cos(angle))))) // Adjust Y for bending
+		cylinderPosition.x = positionWorld.x // Keep X the same
+		cylinderPosition.y = positionWorld.y.add(circleRadius.mul((float(1.0).sub(cos(angle))))) // Adjust Y for bending
 
 		// const morphFactor = smoothstep(0.0, float(BendManager.radius).div(2), distanceFromCenter).mul(BendManager.progress)
-		const finalPosition = mix(planePosition, cylinderPosition, BendManager.progress)
+		const finalPosition = mix(planePosition, sphericalPosition, BendManager.progress)
 
 		// Transform the vertex position
 		// gl_Position = projectionMatrix * modelViewMatrix * vec4(spherePosition, 1.0)
@@ -130,20 +234,6 @@ export const getInstanceMatrixNode = (instancedMesh) => {
 	}
 
 	return instanceMatrixNode
-}
-
-// Full shaders
-export const vertexBendNode = () => {
-	const { powerX, backX, powerY, backY } = BendManager
-	return Fn(() => {
-		const transformed = modelViewMatrix.mul(positionLocal)
-
-		// need access positionLocal after rotation (transformations), so vertexNode is the one, not positionNode
-		const curve = getBend(positionWorld.z, powerX, backX, powerY, backY)
-		const mvPosition = vec4(transformed.add(curve).xyz, transformed.w)
-
-		return cameraProjectionMatrix.mul(mvPosition)
-	})()
 }
 
 export const vertexBendBatchedNode = (batchedMesh, varWorldPos, varNormalLocal) => {
