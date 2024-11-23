@@ -1,46 +1,84 @@
 // Tsl function to bend
 
-import { abs, cameraProjectionMatrix, instanceIndex, buffer, modelViewMatrix, positionLocal, positionWorld, select, sqrt, vec2, vec4, InstancedInterleavedBuffer, DynamicDrawUsage, instancedDynamicBufferAttribute, instancedBufferAttribute, mat4, Fn, mat3, modelWorldMatrix, vec3, color, remap, clamp, output, mix, textureSize, textureLoad, int, ivec2, float, normalLocal, tangentLocal, drawIndex, cameraViewMatrix, modelNormalMatrix, normalWorld, sin, uv, positionView, texture, step, If, max, smoothstep, dot, cos, fract, PI } from "three/tsl"
+import { abs, cameraProjectionMatrix, instanceIndex, normalize, modelViewMatrix, positionLocal, positionWorld, select, sqrt, vec2, vec4, InstancedInterleavedBuffer, DynamicDrawUsage, instancedDynamicBufferAttribute, instancedBufferAttribute, mat4, Fn, mat3, modelWorldMatrix, vec3, color, remap, clamp, output, mix, textureSize, textureLoad, int, ivec2, float, normalLocal, tangentLocal, drawIndex, cameraViewMatrix, modelNormalMatrix, normalWorld, sin, uv, positionView, texture, step, If, max, smoothstep, dot, cos, fract, PI, length, atan, acos, atan2 } from "three/tsl"
 import BendManager from "../managers/BendManager"
 
 // varying vec2 vUv;
 
-// void main() {
-//   vUv = uv; // Pass UV coordinates to the fragment shader
+// // Sphere center offset along Y-axis
+// vec3 sphereCenter = vec3(0.0, -sphereOffset, 0.0);
 
-//   // Map plane vertices to spherical coordinates
-//   float radius = 1.0;
-//   float theta = vUv.y * PI; // Latitude
-//   float phi = vUv.x * 2.0 * PI; // Longitude
+// // Compute distance from the plane center (XZ plane)
+// float distanceFromCenter = length(planePosition.xz);
 
-//   vec3 spherePosition;
-//   spherePosition.x = radius * sin(theta) * cos(phi);
-//   spherePosition.y = radius * cos(theta);
-//   spherePosition.z = radius * sin(theta) * sin(phi);
+// // Compute spherical coordinates (radius, theta, phi)
+// float radius = length(planePosition - sphereCenter);
+// float theta = atan(planePosition.z, planePosition.x); // Azimuthal angle
+// float phi = acos((planePosition.y - sphereCenter.y) / radius); // Polar angle
 
-//   // Transform the vertex position
-//   gl_Position = projectionMatrix * modelViewMatrix * vec4(spherePosition, 1.0);
-// }
+// // Spherical position
+// vec3 spherePosition;
+// spherePosition.x = radius * sin(phi) * cos(theta);
+// spherePosition.y = radius * cos(phi);
+// spherePosition.z = radius * sin(phi) * sin(theta);
+
+// // Interpolate based on progress and distance from center
+// float morphFactor = progress * smoothstep(0.0, planeWidth * 0.5, distanceFromCenter);
+// vec3 finalPosition = mix(planePosition, spherePosition, morphFactor);
+
+// float lat = (uv.x - 0.5) * 90.0;
+// float lon = abs((uv.y - 0.5) * 180.0);
+
+// float latRad = lat * (PI / 180.0);
+// float lonRad = lon * (PI / 180.0);
+
+// float x = sin(latRad) * sin(lonRad);
+// float y = cos(latRad);
+// float z = cos(latRad) * sin(lonRad);
 
 // Full shaders
 export const vertexBendSphereNode = () =>
 	// const { powerX, backX, powerY, backY } = BendManager
 	Fn(() => {
-		const vUv = uv()
-
 		const planePosition = positionLocal.toVar()
+		const sphereCenter = vec3(0.0, float(BendManager.radius).div(2), 0.0)
+		const distanceFromCenter = length(planePosition.xz)
 
-		// Map plane vertices to spherical coordinates
+		// Compute spherical coordinates (radius, theta, phi)
+		// const radius = length(planePosition.sub(sphereCenter))
+		// const theta = atan(vec2(planePosition.z, planePosition.x)) // Azimuthal angle
+		// const phi = acos((planePosition.y.sub(sphereCenter.y)).div(float(BendManager.radius).div(2))) // Polar angle
+
+		// // Map plane vertices to spherical coordinates, based on UVs, 2D
+		// const vUv = uv()
 		const radius = float(BendManager.radius).div(2)
-		const theta = vUv.y.mul(PI) // Latitude
-		const phi = vUv.x.mul(2).mul(PI) // Longitude
+		// const theta = vUv.y.mul(PI) // Latitude
+		// const phi = vUv.x.sub(-0.5).mul(2).mul(PI) // Longitude
 
-		const spherePosition = vec3(0).toVar()
-		spherePosition.x = radius.mul(sin(theta)).mul(cos(phi))
-		spherePosition.y = radius.mul(cos(theta))
-		spherePosition.z = radius.mul(sin(theta)).mul(sin(phi))
+		// // Compute spherical coordinates
+		// const theta = float(planePosition.z.div(radius)).mul(PI) // Latitude
+		// const phi = float(planePosition.x.div(radius)).mul(2).mul(PI) // Longitude
 
-		const finalPosition = mix(planePosition, spherePosition, BendManager.progress)
+		// const spherePosition = vec3(0).toVar()
+		// spherePosition.x = radius.mul(sin(theta)).mul(cos(phi))
+		// spherePosition.y = radius.mul(cos(theta))
+		// spherePosition.z = radius.mul(sin(theta)).mul(sin(phi))
+
+		// BEND Z
+
+		// Calculate circle center offset along the Z-axis
+		const circleRadius = float(BendManager.radius).div(float(2).mul(PI)) // Radius to match plane length to circumference
+		const centerZ = float(0) // Circle center is behind the plane
+
+		// Apply bending based on progress
+		const cylinderPosition = vec3(0).toVar()
+		const angle = float(positionLocal.z).div(float(BendManager.radius)).mul(2.0).mul(PI) // Map Z to an angle around the circle
+		cylinderPosition.z = centerZ.add(circleRadius.mul(sin(angle.mul(BendManager.progress)))) // Circular Z-coordinate
+		cylinderPosition.x = positionLocal.x // Keep X the same
+		cylinderPosition.y = positionLocal.y.add(circleRadius.mul((float(1.0).sub(cos(angle))))) // Adjust Y for bending
+
+		// const morphFactor = smoothstep(0.0, float(BendManager.radius).div(2), distanceFromCenter).mul(BendManager.progress)
+		const finalPosition = mix(planePosition, cylinderPosition, BendManager.progress)
 
 		// Transform the vertex position
 		// gl_Position = projectionMatrix * modelViewMatrix * vec4(spherePosition, 1.0)
