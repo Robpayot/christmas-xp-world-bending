@@ -6,7 +6,15 @@
 	"editor.formatOnType": false,
 	"editor.codeActionsOnSave": ["source.fixAll"],
 	"eslint.codeActionsOnSave.mode": "all",
-	"eslint.validate": ["javascript", "javascriptreact", "typescript", "vue", "json", "json5"],
+	"eslint.validate": [
+		"javascript",
+		"javascriptreact",
+		"typescript",
+		"vue",
+		"json",
+		"jsonc",
+		"json5"
+	],
 	"editor.formatOnSaveMode": "file",
 	"files.autoSave": "onFocusChange",
 	"git.confirmSync": false,
