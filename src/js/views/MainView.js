@@ -1,5 +1,4 @@
 // Vendor
-import { Scene } from 'three'
 
 // Modules
 import Debugger from '@/js/managers/Debugger'
@@ -12,24 +11,19 @@ import OrbitCamera from '../cameras/OrbitCamera'
 import settings from './settings'
 
 import {
-	modelViewProjection,
 	uniform,
-	vec4,
 	mix,
 	normalWorld,
-	color,
 	smoothstep,
 	Fn,
-	If,
 	vec3,
-	sin,
-	abs,
-	float,
 	Color,
+	AmbientLight,
+	DirectionalLight,
+	Scene
 } from 'three/tsl'
 import Floor from '../components/Floor'
 import Decor from '../components/Decor'
-import MainLights from '../components/MainLights'
 
 export default class MainView {
 	config
@@ -38,6 +32,10 @@ export default class MainView {
 	renderer
 	components
 	debugFolder
+	lightSettings = {
+		ambientColor: '#c4c4c4',
+		sunColor: '#587994'
+	}
 	constructor({ config, renderer }) {
 		// Options
 		this.config = config
@@ -50,10 +48,11 @@ export default class MainView {
 		this.cameraManager = this._createCameraManager()
 		this.components = null
 
-		this.debugFolder = this._createDebugFolder()
-
 		// After loading
 		this.components = this._createComponents()
+		this.lights = this._createLights()
+
+		this.debugFolder = this._createDebugFolder()
 
 		// update renderOrders
 		// this._updateRenderOrder()
@@ -131,8 +130,8 @@ export default class MainView {
 		// this.scene.add(ResourceLoader.get('watercolor/scene').scene)
 		components.sphere = this._addComp(Sphere)
 		components.floor = this._addComp(Floor)
-		// components.decor = this._addComp(Decor)
-		components.lights = this._addComp(MainLights)
+		components.decor = this._addComp(Decor)
+
 		return components
 	}
 
@@ -153,6 +152,18 @@ export default class MainView {
 		for (const key in this.components) {
 			if (typeof this.components[key].destroy === 'function') this.components[key].destroy()
 		}
+	}
+
+	_createLights() {
+		const sun = new DirectionalLight(this.lightSettings.sunColor, 30)
+		const ambient = new AmbientLight(this.lightSettings.ambientColor, 0.7) // Soft white light
+		// there is an inversion on Decor X --> Y / Y --> X / Z --> Z
+		sun.position.set(-6.15, 2.68, -1.48)   // Position the sun
+
+		this.scene.add(ambient)
+		this.scene.add(sun)
+
+		return { sun, ambient }
 	}
 
 	/**
@@ -208,6 +219,24 @@ export default class MainView {
 
 		const debugFolder = Debugger.addFolder({ title: `Scene ${this.config.name}`, expanded: true })
 
+		debugFolder.addBinding(this.lights.sun, "position")
+		debugFolder.addBinding(this.lightSettings, "ambientColor").on('change', () => {
+			this.lights.ambient.color = new Color(this.lightSettings.ambientColor)
+		})
+		debugFolder.addBinding(this.lightSettings, "sunColor").on('change', () => {
+			this.lights.sun.color = new Color(this.lightSettings.sunColor)
+		})
+		// lightsFolder.add(this.sun.position, "x", -10, 10).name("Sun X")
+		// lightsFolder.add(this.sun.position, "y", -10, 10).name("Sun Y")
+		// lightsFolder.add(this.sun.position, "z", -10, 10).name("Sun Z")
+		// lightsFolder.add(this.sun, "intensity", 0, 10).name("Sun Intensity")
+		// lightsFolder.addColor(colors, "sun").name("Sun Color").onChange((c) => {
+		// 	this.sun.color = c.convertLinearToSRGB()
+		// })
+		// lightsFolder.add(this.ambient, "intensity", 0, 10).name("Ambient Intensity")
+		// lightsFolder.addColor(colors, "ambient").name("Ambient Color").onChange((c) => {
+		// 	this.ambient.color = c.convertLinearToSRGB()
+		// })
 		// Debugger.on('save', () => {
 		//   Debugger.save(settings, settings.file).then((e) => {
 		//     if (e.status === 200) console.log(`Successfully saved file: ${settings.file}`)

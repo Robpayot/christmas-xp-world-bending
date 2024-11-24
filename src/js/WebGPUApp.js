@@ -47,6 +47,8 @@ export default class WebGPUApp {
 			canvas: this.canvas,
 			isReady: this.afterInit
 		})
+
+		console.log('là')
 		// this.composer = this._createComposer()
 
 	}
@@ -110,7 +112,7 @@ export default class WebGPUApp {
 	// precompile shaders and materials
 	_precompile() {
 		const { scene, camera } = this.activeView
-		// this.renderer.instance.compile(scene, camera)
+		this.renderer.instance.compile(scene, camera)
 
 		// precompile textures
 		const textures = LoaderManager.textures

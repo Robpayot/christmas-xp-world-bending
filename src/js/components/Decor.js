@@ -2,7 +2,7 @@ import { BatchedMesh, Group, MathUtils, Mesh, MeshBasicMaterial, MeshMatcapMater
 import LoaderManager from '@/js/managers/LoaderManager'
 import BendManager from '../managers/BendManager'
 import { CircleGeometry, MeshNormalNodeMaterial, MeshStandardNodeMaterial, varying, vec3 } from 'three/tsl'
-import { vertexBendNode, vertexBendSphereNode } from '../tsl/utils'
+import { vertexBendBatchedNode, vertexBendNode, vertexBendSphereNode } from '../tsl/utils'
 import { physicalToStandardMatNode } from '../tsl/physicalToStandard'
 
 const GEOMETRY = new PlaneGeometry(BendManager.radius, BendManager.radius, 32, 32)
@@ -27,7 +27,7 @@ export default class Decor extends Group {
 		const scene  = LoaderManager.get('decor').scene
 
 		// Keep small assets
-		for (let i = 46; i >= 0; i--) { //
+		for (let i = 100; i >= 0; i--) { //
 			scene.remove(scene.children[i])
 		}
 
@@ -45,8 +45,8 @@ export default class Decor extends Group {
 				const vertices = child.geometry.attributes.position.count
 				info.maxIndices += indices
 				info.maxVertices += vertices
-				// child.geometry.computeBoundingSphere()
-				// child.geometry.computeVertexNormals()
+				child.geometry.computeBoundingSphere()
+				child.geometry.computeVertexNormals()
 				this.decorGeos.push(child.geometry)
 			}
 		}
@@ -60,22 +60,6 @@ export default class Decor extends Group {
 		// for (let i = 0; i < geometries.length; i++) {
 		// 	const geometry = geometries[i]
 		// 	mesh.addGeometry(geometry)
-		// }
-
-		// const dummy = new Object3D()
-		// let x = -1
-		// let z = 0
-		// for (let i = 0; i < count; i++) {
-		// 	x *= -1
-		// 	const id = randomInt(0, geometries.length - 1)
-		// 	mesh.addInstance(id) // id
-		// 	const dist = 4.5 / 2 + geometries[id].boundingSphere.radius + random(-.5, 7)
-		// 	dummy.position.set(x * dist, 0, z)
-		// 	dummy.rotation.set(0, random() * Math.PI * 2, 0)
-		// 	dummy.scale.set(.9, .9, .9)
-		// 	dummy.updateMatrix()
-		// 	mesh.setMatrixAt(i, dummy.matrix)
-		// 	z += 200 / count
 		// }
 
 		// this._createMaterial()
@@ -104,7 +88,7 @@ export default class Decor extends Group {
 		const varNormalLocal = varying(vec3(0))
 
 		// if (bendMode.value) {
-		// 	material.vertexNode = vertexBendBatchedNode(mesh, varWorldPos, varNormalLocal)
+		material.vertexNode = vertexBendBatchedNode(mesh, varWorldPos, varNormalLocal)
 		// 	material.normalNode = transformNormalToView(varNormalLocal) // Fix normals, issue on instancedMesh and Batched
 		// 	material.outputNode = fragmentFogNode(varWorldPos)
 		// }
@@ -120,16 +104,44 @@ export default class Decor extends Group {
 	}
 
 	_addInstances() {
-		for (let i = 0; i < this.nbDecor; i++) {
 
+		const dummy = new Object3D()
+		let x = -1
+		let z = 0
+		// for (let i = 0; i < this.nbDecor; i++) {
+		// 	x *= -1
+		// 	const id = MathUtils.randInt(0, this.decorGeos.length - 1)
+		// 	this.mesh.addInstance(id) // id
+		// 	const dist = 4.5 / 2 + this.decorGeos[id].boundingSphere.radius + MathUtils.randFloat(-.5, 7)
+		// 	dummy.position.set(0, 0, z)
+		// 	dummy.rotation.set(0, MathUtils.randFloat() * Math.PI * 2, 0)
+		// 	dummy.scale.set(.9, .9, .9)
+		// 	dummy.updateMatrix()
+		// 	this.mesh.setMatrixAt(i, dummy.matrix)
+		// 	// z += 1 / this.nbDecor
+		// }
+
+		for (let i = 0; i < this.nbDecor; i++) {
+			x *= -1
 			const geoId = MathUtils.randInt(0, this.baseGeoCount - 1)
 			this.mesh.addInstance(i)
 
 			const dummy = new Object3D()
+			const id = MathUtils.randInt(0, this.decorGeos.length - 1)
+
+			const dist = 4.5 / 2 + this.decorGeos[id].boundingSphere.radius + MathUtils.randFloat(-.5, 7)
+			dummy.position.set(x * dist, 0, z)
+			// dummy.position.set(x * dist, 0, z)
+			// dummy.rotation.set(0, random() * Math.PI * 2, 0)
+			// dummy.scale.set(.9, .9, .9)
+			// dummy.rotation.set(0, MathUtils.randFloat() * Math.PI * 2, 0)
+			// dummy.scale.set(.9, .9, .9)
 			// dummy.position.copy(BACTH_FIX_DEF_POS) // TODO: check
 			dummy.updateMatrix()
 			this.mesh.setMatrixAt(i, dummy.matrix)
 			this.instances.push({ id: i, geometryId: geoId, dummy })
+
+			z -= 50 / this.nbDecor
 
 			this.totalInstance++
 		}

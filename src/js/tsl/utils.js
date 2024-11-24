@@ -269,75 +269,78 @@ export const getInstanceMatrixNode = (instancedMesh) => {
 	return instanceMatrixNode
 }
 
-export const vertexBendBatchedNode = (batchedMesh, varWorldPos, varNormalLocal) => {
-	const { powerX, backX, powerY, backY } = BendManager
-	return Fn((builder) => {
-		// POSITION
-		let batchingIdNode = null
+export const vertexBendBatchedNode = (batchedMesh, varWorldPos, varNormalLocal) => Fn((builder) => {
+	// POSITION
+	let batchingIdNode = null
 
-		// WebGL fallback if
-		if (batchingIdNode === null) {
-			// check if https://github.com/mrdoob/three.js/blob/841ea631018e0bf40c7de1b54811101f77f1e1b3/src/renderers/webgl-fallback/nodes/GLSLNodeBuilder.js#L626
-			if (builder.getDrawIndex() === null) {
-				batchingIdNode = instanceIndex
-			} else {
-				batchingIdNode = drawIndex
-			}
+	// WebGL fallback if
+	if (batchingIdNode === null) {
+		// check if https://github.com/mrdoob/three.js/blob/841ea631018e0bf40c7de1b54811101f77f1e1b3/src/renderers/webgl-fallback/nodes/GLSLNodeBuilder.js#L626
+		if (builder.getDrawIndex() === null) {
+			batchingIdNode = instanceIndex
+		} else {
+			batchingIdNode = drawIndex
 		}
+	}
 
-		const getIndirectIndex = Fn(([id]) => {
-			const size = textureSize(textureLoad(batchedMesh._indirectTexture), 0)
-			const x = int(id).modInt(int(size))
-			const y = int(id).div(int(size))
-			return textureLoad(batchedMesh._indirectTexture, ivec2(x, y)).x
+	const getIndirectIndex = Fn(([id]) => {
+		const size = textureSize(textureLoad(batchedMesh._indirectTexture), 0)
+		const x = int(id).modInt(int(size))
+		const y = int(id).div(int(size))
+		return textureLoad(batchedMesh._indirectTexture, ivec2(x, y)).x
 
-		}).setLayout({
-			name: 'getIndirectIndex',
-			type: 'uint',
-			inputs: [{ name: 'id', type: 'int' }]
-		})
+	}).setLayout({
+		name: 'getIndirectIndex',
+		type: 'uint',
+		inputs: [{ name: 'id', type: 'int' }]
+	})
 
-		const matriceTexture = batchedMesh._matricesTexture
+	const matriceTexture = batchedMesh._matricesTexture
 
-		const size = textureSize(textureLoad(matriceTexture), 0)
-		const j = float(getIndirectIndex(int(batchingIdNode))).mul(4).toVar()
+	const size = textureSize(textureLoad(matriceTexture), 0)
+	const j = float(getIndirectIndex(int(batchingIdNode))).mul(4).toVar()
 
-		const x = int(j.mod(size))
-		const y = int(j).div(int(size))
-		const batchingMatrix = mat4(
-			textureLoad(matriceTexture, ivec2(x, y)),
-			textureLoad(matriceTexture, ivec2(x.add(1), y)),
-			textureLoad(matriceTexture, ivec2(x.add(2), y)),
-			textureLoad(matriceTexture, ivec2(x.add(3), y))
-		)
+	const x = int(j.mod(size))
+	const y = int(j).div(int(size))
+	const batchingMatrix = mat4(
+		textureLoad(matriceTexture, ivec2(x, y)),
+		textureLoad(matriceTexture, ivec2(x.add(1), y)),
+		textureLoad(matriceTexture, ivec2(x.add(2), y)),
+		textureLoad(matriceTexture, ivec2(x.add(3), y))
+	)
 
-		const bm = mat3(batchingMatrix)
-		const batchPos = batchingMatrix.mul(positionLocal).xyz
+	const bm = mat3(batchingMatrix)
+	const batchPos = batchingMatrix.mul(positionLocal).xyz
 
-		// positionWorld is broken by vertexNode, had to recalculate here
-		varWorldPos.assign(modelWorldMatrix.mul(batchPos))
+	// positionWorld is broken by vertexNode, had to recalculate here
+	varWorldPos.assign(modelWorldMatrix.mul(batchPos))
 
-		// Bending
-		const transformed = modelViewMatrix.mul(batchPos)
-		positionView.assign(transformed) // fix point lights <3
+	// Bending
+	const transformed = modelViewMatrix.mul(batchPos).toVar()
+	positionView.assign(transformed) // fix point lights <3
 
-		const curve = getBend(varWorldPos.z, powerX, backX, powerY, backY)
-		const mvPosition = vec4(transformed.add(curve).xyz, transformed.w)
+	const zCurve = abs(batchPos.z.mul(batchPos.z.mul(BendManager.deep).mul(0.01)))
+	const xCurve = abs(batchPos.x.mul(batchPos.x.mul(BendManager.deep).mul(0.01)))
 
-		// Normals
-		const transformedNormal = normalLocal.div(vec3(bm[ 0 ].dot(bm[ 0 ]), bm[ 1 ].dot(bm[ 1 ]), bm[ 2 ].dot(bm[ 2 ])))
-		const batchingNormal = bm.mul(transformedNormal).xyz
-		normalLocal.assign(batchingNormal)
+	// Transform the vertex position
+	// const transformed = modelViewMatrix.mul(pos)
+	transformed.y.subAssign(zCurve.add(xCurve))
 
-		varNormalLocal.assign(normalLocal)
+	const mvPosition = vec4(transformed.xyz, transformed.w)
 
-		if (builder.hasGeometryAttribute('tangent')) {
-			tangentLocal.mulAssign(bm)
-		}
+	// Normals
+	const transformedNormal = normalLocal.div(vec3(bm[ 0 ].dot(bm[ 0 ]), bm[ 1 ].dot(bm[ 1 ]), bm[ 2 ].dot(bm[ 2 ])))
+	const batchingNormal = bm.mul(transformedNormal).xyz
+	normalLocal.assign(batchingNormal)
 
-		return cameraProjectionMatrix.mul(mvPosition)
-	})()
-}
+	varNormalLocal.assign(normalLocal)
+
+	if (builder.hasGeometryAttribute('tangent')) {
+		tangentLocal.mulAssign(bm)
+	}
+
+	return cameraProjectionMatrix.mul(mvPosition)
+})()
 
 // // Shader for the fog (need worldPos)
 // export const fragmentFogNode = (varWorldPos) => Fn(() => {
