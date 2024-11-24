@@ -14,5 +14,10 @@ export default {
 			type: "texture",
 			path: "./img/matcap.png",
 		},
+		{
+			name: 'decor',
+			type: 'gltf',
+			path: '/models/pack_assets.glb'
+		}
 	],
 }

@@ -28,6 +28,7 @@ import {
 	Color,
 } from 'three/tsl'
 import Floor from '../components/Floor'
+import Decor from '../components/Decor'
 
 export default class MainView {
 	config
@@ -77,9 +78,6 @@ export default class MainView {
 	/**
 	 * Getters & Setters
 	 */
-	get scene() {
-		return this.scene
-	}
 
 	get camera() {
 		return this.cameraManager?.active?.instance
@@ -130,13 +128,14 @@ export default class MainView {
 	_createComponents() {
 		const components = {}
 		// this.scene.add(ResourceLoader.get('watercolor/scene').scene)
-		components.sphere = this._createSphere()
-		components.floor = this._createFloor()
+		components.sphere = this._addComp(Sphere)
+		components.floor = this._addComp(Floor)
+		components.decor = this._addComp(Decor)
 		return components
 	}
 
-	_createSphere() {
-		const component = new Sphere({
+	_addComp(Class) {
+		const component = new Class({
 			config: this.config,
 			debug: this.debugFolder,
 		})
@@ -146,16 +145,6 @@ export default class MainView {
 		return component
 	}
 
-	_createFloor() {
-		const component = new Floor({
-			config: this.config,
-			debug: this.debugFolder,
-		})
-
-		this.scene.add(component)
-
-		return component
-	}
 	_destroyComponents() {
 		if (!this.components) return
 		for (const key in this.components) {
