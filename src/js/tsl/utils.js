@@ -134,7 +134,7 @@ export const vertexBendNode = () =>
 
 		// Transform the vertex position
 		const transformed = modelViewMatrix.mul(pos).toVar()
-		transformed.y.addAssign(zCurve.add(xCurve).oneMinus())
+		transformed.y.subAssign(zCurve.add(xCurve))
 
 		const mvPosition = vec4(transformed.xyz, transformed.w)
 
