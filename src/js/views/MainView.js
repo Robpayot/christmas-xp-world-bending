@@ -21,7 +21,7 @@ import {
 	AmbientLight,
 	DirectionalLight,
 	Scene
-} from 'three/tsl'
+} from 'three/webgpu'
 import Floor from '../components/Floor'
 import Decor from '../components/Decor'
 

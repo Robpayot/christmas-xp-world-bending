@@ -1,7 +1,7 @@
 import { BatchedMesh, Group, MathUtils, Mesh, MeshBasicMaterial, MeshMatcapMaterial, Object3D, PlaneGeometry, TextureLoader } from 'three'
 import LoaderManager from '@/js/managers/LoaderManager'
 import BendManager from '../managers/BendManager'
-import { CircleGeometry, MeshNormalNodeMaterial, MeshStandardNodeMaterial, varying, vec3 } from 'three/tsl'
+import { CircleGeometry, MeshNormalNodeMaterial, MeshStandardNodeMaterial, varying, vec3 } from 'three/webgpu'
 import { vertexBendBatchedNode, vertexBendNode, vertexBendSphereNode } from '../tsl/utils'
 import { physicalToStandardMatNode } from '../tsl/physicalToStandard'
 

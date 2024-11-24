@@ -1,4 +1,4 @@
-import { MeshStandardNodeMaterial } from 'three/tsl'
+import { MeshStandardNodeMaterial } from 'three/webgpu'
 
 export function physicalToStandardMatNode(physicalMaterial) {
 	const standardMaterial = new MeshStandardNodeMaterial()

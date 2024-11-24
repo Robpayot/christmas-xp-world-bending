@@ -8,7 +8,7 @@ import {
 	ReinhardToneMapping,
 	SRGBColorSpace,
 } from 'three'
-import { WebGPURenderer } from 'three/tsl'
+import { WebGPURenderer } from 'three/webgpu'
 
 // import WebGPU from 'three/addons/capabilities/WebGPU.js'
 

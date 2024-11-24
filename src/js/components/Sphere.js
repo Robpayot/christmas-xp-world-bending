@@ -1,6 +1,6 @@
 import { Mesh, MeshBasicMaterial, MeshMatcapMaterial, Object3D, SphereGeometry, TextureLoader } from 'three'
 import LoaderManager from '@/js/managers/LoaderManager'
-import { MeshLambertNodeMaterial, MeshStandardNodeMaterial } from 'three/tsl'
+import { MeshLambertNodeMaterial, MeshStandardNodeMaterial } from 'three/webgpu'
 
 const SPHERE_GEOMETRY = new SphereGeometry(1, 32, 32)
 

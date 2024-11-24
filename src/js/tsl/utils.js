@@ -1,6 +1,6 @@
 // Tsl function to bend
 
-import { abs, cameraProjectionMatrix, instanceIndex, normalize, modelViewMatrix, positionLocal, positionWorld, select, sqrt, vec2, vec4, InstancedInterleavedBuffer, DynamicDrawUsage, instancedDynamicBufferAttribute, instancedBufferAttribute, mat4, Fn, mat3, modelWorldMatrix, vec3, color, remap, clamp, output, mix, textureSize, textureLoad, int, ivec2, float, normalLocal, tangentLocal, drawIndex, cameraViewMatrix, modelNormalMatrix, normalWorld, sin, uv, positionView, texture, step, If, max, smoothstep, dot, cos, fract, PI, length, atan, acos, atan2, asin } from "three/tsl"
+import { abs, cameraProjectionMatrix, instanceIndex, normalize, modelViewMatrix, positionLocal, positionWorld, select, sqrt, vec2, vec4, InstancedInterleavedBuffer, DynamicDrawUsage, instancedDynamicBufferAttribute, instancedBufferAttribute, mat4, Fn, mat3, modelWorldMatrix, vec3, color, remap, clamp, output, mix, textureSize, textureLoad, int, ivec2, float, normalLocal, tangentLocal, drawIndex, cameraViewMatrix, modelNormalMatrix, normalWorld, sin, uv, positionView, texture, step, If, max, smoothstep, dot, cos, fract, PI, length, atan, acos, atan2, asin } from "three/webgpu"
 import BendManager from "../managers/BendManager"
 
 // varying vec2 vUv;

@@ -1,4 +1,4 @@
-import { uniform } from 'three/tsl'
+import { uniform } from 'three/webgpu'
 import Debugger from '@/js/managers/Debugger'
 
 const settings = { powerX: 28.8, backX: 0.12, powerY: 54.2, backY: 1.7 }
