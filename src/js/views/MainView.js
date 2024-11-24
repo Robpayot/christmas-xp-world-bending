@@ -29,6 +29,7 @@ import {
 } from 'three/tsl'
 import Floor from '../components/Floor'
 import Decor from '../components/Decor'
+import MainLights from '../components/MainLights'
 
 export default class MainView {
 	config
@@ -130,7 +131,8 @@ export default class MainView {
 		// this.scene.add(ResourceLoader.get('watercolor/scene').scene)
 		components.sphere = this._addComp(Sphere)
 		components.floor = this._addComp(Floor)
-		components.decor = this._addComp(Decor)
+		// components.decor = this._addComp(Decor)
+		components.lights = this._addComp(MainLights)
 		return components
 	}
 
@@ -138,6 +140,7 @@ export default class MainView {
 		const component = new Class({
 			config: this.config,
 			debug: this.debugFolder,
+			scene: this.scene
 		})
 
 		this.scene.add(component)

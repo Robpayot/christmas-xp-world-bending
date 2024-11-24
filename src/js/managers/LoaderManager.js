@@ -83,7 +83,7 @@ class LoaderManager {
 			this.GLTFLoader.load(
 				url,
 				(result) => {
-					this.assets[name].gltf = result
+					this.assets[name] = result
 					resolve(result)
 				},
 				undefined,

@@ -1,5 +1,6 @@
 import { Mesh, MeshBasicMaterial, MeshMatcapMaterial, Object3D, SphereGeometry, TextureLoader } from 'three'
 import LoaderManager from '@/js/managers/LoaderManager'
+import { MeshLambertNodeMaterial, MeshStandardNodeMaterial } from 'three/tsl'
 
 const SPHERE_GEOMETRY = new SphereGeometry(1, 32, 32)
 
@@ -22,7 +23,7 @@ export default class Sphere extends Object3D {
 	}
 
 	_createMaterial() {
-		this.material = new MeshMatcapMaterial({ matcap: LoaderManager.assets['matcap'].texture })
+		this.material = new MeshLambertNodeMaterial()
 		// this.material = new MeshBasicMaterial({ color:'red' })
 	}
 

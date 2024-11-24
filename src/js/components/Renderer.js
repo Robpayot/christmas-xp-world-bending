@@ -23,13 +23,15 @@ export default class Renderer {
 	#debug
 	#debugStats
 	#instance
-	constructor({ canvas }) {
+	constructor({ canvas, isReady }) {
 		// Options
 		this.#canvas = canvas
 
+		this.isReady = isReady
+
 		// Setup
 		this.#debug = this._createDebug()
-		this.#instance = this._createRenderer()
+		this._createRenderer()
 		this.#debugStats = this._createDebugStats()
 	}
 
@@ -56,7 +58,7 @@ export default class Renderer {
 	/**
 	 * Private
 	 */
-	_createRenderer() {
+	async _createRenderer() {
 		// this.isWebGPU = WebGPU.isAvailable()
 		// console.log(WebGPU)
 
@@ -68,8 +70,10 @@ export default class Renderer {
 			canvas: this.#canvas,
 			antialias: true,
 			powerPreference: 'high-performance',
+			logarithmicDepthBuffer: false,
+			alpha: false,
 		})
-		renderer.init()
+		await renderer.init()
 		const clearColor = new Color(0xffffff)
 		const clearAlpha = 1
 		renderer.setClearColor(clearColor, clearAlpha)
@@ -77,7 +81,7 @@ export default class Renderer {
 		// renderer.shadowMap.enabled = true
 		// renderer.shadowMap.type = PCFSoftShadowMap
 		// renderer.shadowMap.type = BasicShadowMap
-		renderer.info.autoReset = false
+		// renderer.info.autoReset = false
 		renderer.outputColorSpace = SRGBColorSpace
 		// renderer.autoClear = false;
 
@@ -100,22 +104,24 @@ export default class Renderer {
 			this.#debug.addBinding(renderer, 'toneMappingExposure', { min: 0, max: 10 })
 		}
 
-		return renderer
+		this.#instance = renderer
+
+		this.isReady()
 	}
 
 	/**
 	 * Render
 	 */
 	render(scene, camera) {
-		this.#instance.renderAsync(scene, camera) // might cause issues?
+		this.#instance?.renderAsync(scene, camera) // might cause issues?
 	}
 
 	/**
 	 * Resize
 	 */
 	resize({ width, height, dpr }) {
-		this.#instance.setPixelRatio(dpr)
-		this.#instance.setSize(width, height)
+		this.#instance?.setPixelRatio(dpr)
+		this.#instance?.setSize(width, height)
 	}
 
 	/**
@@ -137,17 +143,8 @@ export default class Renderer {
 
 	_createDebugStats() {
 		if (!this.#debug) return
+		return
 
-		const stats = this.#debug.addFolder({ title: 'Stats' })
-		const memory = stats.addFolder({ title: 'Memory' })
-		memory.addBinding(this.#instance.info.memory, 'geometries', { readonly: true })
-		memory.addBinding(this.#instance.info.memory, 'textures', { readonly: true })
-		const render = stats.addFolder({ title: 'Render' })
-		render.addBinding(this.#instance.info.render, 'drawCalls', { readonly: true })
-		render.addBinding(this.#instance.info.render, 'triangles', { readonly: true })
-		render.addBinding(this.#instance.info.render, 'points', { readonly: true })
-		render.addBinding(this.#instance.info.render, 'lines', { readonly: true })
-		return stats
 	}
 
 	_removeDebug() {

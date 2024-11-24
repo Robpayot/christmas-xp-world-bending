@@ -14,41 +14,47 @@ import LoaderManager from './managers/LoaderManager'
 import Stats from 'stats.js'
 
 export default class WebGPUApp {
-	#canvas
-	#isDevelopment
-	#isViewRenderingEnabled
-	#isStatsGpuQueryStarted
-	#clock
-	#renderer
-	#isActive
-	#views
-	#stats
-	#statsGpuPanel
-	#composer
-	#activeView
+	canvas
+	isDevelopment
+	isViewRenderingEnabled
+	isStatsGpuQueryStarted
+	clock
+	renderer
+	isActive
+	views
+	stats
+	statsGpuPanel
+	composer
+	activeView
 	constructor({ canvas, isDevelopment }) {
 		// Options
-		this.#canvas = canvas
-		this.#isDevelopment = isDevelopment
+		this.canvas = canvas
+		this.isDevelopment = isDevelopment
 
 		// Props
-		this.#isActive = true
+		this.isActive = true
 		// this._renderScale = globalConfig.rendering.scale
-		this.#isViewRenderingEnabled = true
-		this.#isStatsGpuQueryStarted = false
+		this.isViewRenderingEnabled = true
+		this.isStatsGpuQueryStarted = false
 
 		if (Debugger) {
 			Debugger.addTab('Main')
 		}
 		// Setup
 		// this._debug = this._createDebug()
-		this.#clock = this._createClock()
-		this.#renderer = this._createRenderer()
-		// this.#composer = this._createComposer()
+		this.clock = this._createClock()
+		this.renderer = new Renderer({
+			canvas: this.canvas,
+			isReady: this.afterInit
+		})
+		// this.composer = this._createComposer()
 
-		if (this.#isDevelopment) {
-			this.#stats = this._createStats()
-			console.log(this.#stats)
+	}
+
+	afterInit = () => {
+		if (this.isDevelopment) {
+			this.stats = this._createStats()
+			console.log(this.stats)
 		}
 
 		this._initViews()
@@ -64,9 +70,9 @@ export default class WebGPUApp {
 		this._removeStats()
 		this._events(false)
 		document.removeEventListener('visibilitychange', this._visibilityChangeHandler)
-		this.#activeView?.destroy()
-		this.#composer?.destroy()
-		this.#renderer.destroy()
+		this.activeView?.destroy()
+		this.composer?.destroy()
+		this.renderer.destroy()
 	}
 
 	/**
@@ -88,28 +94,28 @@ export default class WebGPUApp {
 	}
 
 	_start() {
-		// this.#composer.setup()
-		// this.#activeView.setup()
+		// this.composer.setup()
+		// this.activeView.setup()
 		// this._startStatsGpuQuery()
 	}
 
 	_initViews() {
-		this.#views = {
-			main: new MainView({ renderer: this.#renderer.instance, config: { name: 'Main' }, debug: Debugger }),
+		this.views = {
+			main: new MainView({ renderer: this.renderer.instance, config: { name: 'Main' }, debug: Debugger }),
 		}
 
-		this.#activeView = this.#views.main
+		this.activeView = this.views.main
 	}
 
 	// precompile shaders and materials
 	_precompile() {
-		const { scene, camera } = this.#activeView
-		this.#renderer.instance.compile(scene, camera)
+		const { scene, camera } = this.activeView
+		// this.renderer.instance.compile(scene, camera)
 
 		// precompile textures
 		const textures = LoaderManager.textures
 		textures.forEach((texture) => {
-			// this.#renderer.instance.initTexture(texture)
+			// this.renderer.instance.initTexture(texture)
 		})
 	}
 
@@ -120,21 +126,14 @@ export default class WebGPUApp {
 	}
 
 	_removeStats() {
-		if (!this.#stats) return
-		document.body.removeChild(this.#stats.dom)
-		this.#stats = null
+		if (!this.stats) return
+		document.body.removeChild(this.stats.dom)
+		this.stats = null
 	}
 
 	_createClock() {
 		const clock = new Clock()
 		return clock
-	}
-
-	_createRenderer() {
-		const renderer = new Renderer({
-			canvas: this.#canvas,
-		})
-		return renderer
 	}
 
 	// _createComposer() {
@@ -147,24 +146,24 @@ export default class WebGPUApp {
    * Update cycle
    */
 	_tick() {
-		if (!this.#isActive) return
+		if (!this.isActive) return
 
-		this.#stats?.begin()
+		this.stats?.begin()
 		this._update()
 		this._render()
-		this.#stats?.end()
+		this.stats?.end()
 
-		// if (this.#isDevelopment && this.#renderer) this.#renderer.instance.info.reset()
-		// if (this.#renderer) this.#renderer.instance.info.reset()
+		// if (this.isDevelopment && this.renderer) this.renderer.instance.info.reset()
+		// if (this.renderer) this.renderer.instance.info.reset()
 		// R.P.: Continue to reset info in production to fix an issue using webworkers
 	}
 
 	_update() {
 		// call all components updates
-		const delta = this.#clock.getDelta() * 1000
-		const time = this.#clock.getElapsedTime()
+		const delta = this.clock.getDelta() * 1000
+		const time = this.clock.getElapsedTime()
 		// TODO: update all views
-		const view = this.#views.main
+		const view = this.views.main
 		view?.update({ time, delta })
 		// this._triggerBidelloUpdate()
 	}
@@ -174,23 +173,23 @@ export default class WebGPUApp {
 
 		// if (!view) return
 
-		if (this.#isDevelopment && this.#isStatsGpuQueryStarted) {
-			// this.#statsGpuPanel?.startQuery()
+		if (this.isDevelopment && this.isStatsGpuQueryStarted) {
+			// this.statsGpuPanel?.startQuery()
 		}
 
-		const view = this.#activeView
+		const view = this.activeView
 
-		if (view && this.#isViewRenderingEnabled) {
-			this.#renderer.render(view.scene, view.camera)
-			// this.#composer?.render(view)
+		if (view && this.isViewRenderingEnabled) {
+			this.renderer.render(view.scene, view.camera)
+			// this.composer?.render(view)
 		}
 
-		if (this.#isDevelopment && this.#isStatsGpuQueryStarted) {
-			// this.#statsGpuPanel?.endQuery()
+		if (this.isDevelopment && this.isStatsGpuQueryStarted) {
+			// this.statsGpuPanel?.endQuery()
 		}
 
-		if (this.#isDevelopment) {
-			this.#renderer.updateStats()
+		if (this.isDevelopment) {
+			this.renderer.updateStats()
 		}
 	}
 
@@ -201,12 +200,12 @@ export default class WebGPUApp {
 		const width = (this.width = window.innerWidth)
 		const height = (this.height = window.innerHeight)
 		const dpr = (this.dpr = Settings.dpr)
-		this.#renderer.resize({ width, height, dpr })
+		this.renderer.resize({ width, height, dpr })
 
 		// for each views
 		// call components resize
 
-		this.#activeView.resize({ width, height })
+		this.activeView.resize({ width, height })
 	}
 
 	/**
@@ -222,11 +221,11 @@ export default class WebGPUApp {
 
 	_visibilityChangeHandler = () => {
 		if (document.visibilityState === 'visible') {
-			this.#clock.start()
-			this.#isActive = true
+			this.clock.start()
+			this.isActive = true
 		} else {
-			this.#clock.stop()
-			this.#isActive = false
+			this.clock.stop()
+			this.isActive = false
 		}
 	}
 
