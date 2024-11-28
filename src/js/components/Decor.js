@@ -3,6 +3,7 @@ import LoaderManager from '@/js/managers/LoaderManager'
 import { CircleGeometry, MeshNormalNodeMaterial, MeshStandardNodeMaterial, varying, vec3 } from 'three/webgpu'
 import { vertexBendBatchedNode, vertexBendNode } from '../tsl/utils'
 import { physicalToStandardMatNode } from '../tsl/physicalToStandard'
+// import { Z_DISAPPEAR } from '../managers/TilesManager'
 
 export default class Decor extends Group {
 	material
@@ -16,6 +17,7 @@ export default class Decor extends Group {
 	nbDecor = 50
 	totalGeo = 0
 	totalInstance = 0
+	speed = 0.015
 	constructor({ debug }) {
 		super()
 
@@ -148,7 +150,25 @@ export default class Decor extends Group {
 	/**
 	 * Update
 	 */
-	update({ time, delta }) {}
+	update({ time, delta }) {
+
+		for (let i = 0; i < this.instances.length; i++) {
+			const { dummy, id } = this.instances[i]
+
+			dummy.position.z += delta * this.speed// update
+			// console.log(dummy.position.z)
+
+			// if (dummy.position.z < Z_DISAPPEAR) {
+			// 	// hide to improve perf
+			// 	dummy.position.z = -1000
+			// 	this.mesh.setVisibleAt(id, false)
+			// }
+
+			dummy.updateMatrix()
+			this.mesh.setMatrixAt(id, dummy.matrix)
+
+		}
+	}
 
 	resize({ width, height }) {}
 
