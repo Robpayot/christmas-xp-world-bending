@@ -81,8 +81,6 @@ export default class Decor extends Group {
 		// mesh.sortObjects = sortObjects.value
 		this.add(mesh)
 
-		console.log('oh')
-
 		// WGSL
 		const varWorldPos = varying(vec3(0))
 		const varNormalLocal = varying(vec3(0))

@@ -5,7 +5,6 @@ import Debugger from '@/js/managers/Debugger'
 
 // Cameras
 import MainCamera from '../cameras/MainCamera'
-import Sphere from '../components/Sphere'
 import CameraManager from '../managers/CameraManager'
 import OrbitCamera from '../cameras/OrbitCamera'
 import settings from './settings'
@@ -36,6 +35,18 @@ export default class MainView {
 		ambientColor: '#c4c4c4',
 		sunColor: '#587994'
 	}
+	skySettings = {
+		uRangeA: uniform(0.19),
+		uRangeB: uniform(0.72),
+		uColorA: '#8aa2e7',
+		uColorB: '#6472dd',
+		uColorC: '#141264'
+	}
+	skyUniforms = {
+		uColorA: uniform(new Color(this.skySettings.uColorA)),
+		uColorB: uniform(new Color(this.skySettings.uColorB)),
+		uColorC: uniform(new Color(this.skySettings.uColorC))
+	}
 	constructor({ config, renderer }) {
 		// Options
 		this.config = config
@@ -57,18 +68,8 @@ export default class MainView {
 		// update renderOrders
 		// this._updateRenderOrder()
 
-		const uRange = uniform(1)
-		const uColorE = new Color('#C561B3')
-		const uColorF = new Color('#1D0010')
+		this.scene.backgroundNode = this._skyNode()
 
-		this.scene.backgroundNode = Fn(() => {
-			const rangeY = normalWorld.smoothstep(uRange.mul(-1), uRange).sub(0.5).mul(2).abs()
-			const result = vec3().toVar()
-
-			result.rgb = mix(uColorE, uColorF, smoothstep(0.7, 1, rangeY))
-
-			return result
-		})()
 	}
 
 	destroy() {
@@ -128,7 +129,7 @@ export default class MainView {
 	_createComponents() {
 		const components = {}
 		// this.scene.add(ResourceLoader.get('watercolor/scene').scene)
-		components.sphere = this._addComp(Sphere)
+		// components.sphere = this._addComp(Sphere)
 		components.floor = this._addComp(Floor)
 		components.decor = this._addComp(Decor)
 
@@ -164,6 +165,20 @@ export default class MainView {
 		this.scene.add(sun)
 
 		return { sun, ambient }
+	}
+
+	_skyNode() {
+		return Fn(() => {
+			const rangeY = normalWorld.y.smoothstep(-1, 1).sub(0.5).mul(2).abs()
+			const result = this.skyUniforms.uColorA.toVar()
+
+			//horizon
+			result.rgb = mix(result.rgb, this.skyUniforms.uColorA, smoothstep(0, 0.01, rangeY))
+			result.rgb = mix(result.rgb, this.skyUniforms.uColorB, smoothstep(0.01, this.skySettings.uRangeA, rangeY))
+			result.rgb = mix(result.rgb, this.skyUniforms.uColorC, smoothstep(this.skySettings.uRangeA, this.skySettings.uRangeB, rangeY))
+
+			return result
+		})()
 	}
 
 	/**
@@ -226,22 +241,30 @@ export default class MainView {
 		debugFolder.addBinding(this.lightSettings, "sunColor").on('change', () => {
 			this.lights.sun.color = new Color(this.lightSettings.sunColor)
 		})
-		// lightsFolder.add(this.sun.position, "x", -10, 10).name("Sun X")
-		// lightsFolder.add(this.sun.position, "y", -10, 10).name("Sun Y")
-		// lightsFolder.add(this.sun.position, "z", -10, 10).name("Sun Z")
-		// lightsFolder.add(this.sun, "intensity", 0, 10).name("Sun Intensity")
-		// lightsFolder.addColor(colors, "sun").name("Sun Color").onChange((c) => {
-		// 	this.sun.color = c.convertLinearToSRGB()
-		// })
-		// lightsFolder.add(this.ambient, "intensity", 0, 10).name("Ambient Intensity")
-		// lightsFolder.addColor(colors, "ambient").name("Ambient Color").onChange((c) => {
-		// 	this.ambient.color = c.convertLinearToSRGB()
-		// })
-		// Debugger.on('save', () => {
-		//   Debugger.save(settings, settings.file).then((e) => {
-		//     if (e.status === 200) console.log(`Successfully saved file: ${settings.file}`)
-		//   })
-		// })
+
+		const debugSky = Debugger.addFolder({ title: `Scene sky`, expanded: true })
+
+		debugSky.addBinding(this.skySettings, "uColorA").on('change', () => {
+			this.skyUniforms.uColorA.value = new Color(this.skySettings.uColorA)
+		})
+		debugSky.addBinding(this.skySettings, "uColorB").on('change', () => {
+			this.skyUniforms.uColorB.value = new Color(this.skySettings.uColorB)
+		})
+		debugSky.addBinding(this.skySettings, "uColorC").on('change', () => {
+			this.skyUniforms.uColorC.value = new Color(this.skySettings.uColorC)
+		})
+		debugSky.addBinding(this.skySettings.uRangeA, "value")
+		debugSky.addBinding(this.skySettings.uRangeB, "value")
+
+		const btn = debugSky.addButton({
+			title: 'Save',
+		})
+
+		btn.on('click', () => {
+			navigator.clipboard.writeText(JSON.stringify(this.skySettings))
+			console.log('copied to clipboard', this.skySettings)
+		})
+
 		return debugFolder
 	}
 }
