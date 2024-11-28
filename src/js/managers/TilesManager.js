@@ -2,7 +2,8 @@
 
 // import { playMusic } from "@/playSound"
 
-export const TILE_SIZE = 100 // 200
+export const TILE_SIZE = 200 // 200
+export const TILE_WIDE = 100 // 200
 export const Z_DISAPPEAR = -10
 // Swap 2 tiles infinitly
 

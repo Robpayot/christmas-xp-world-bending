@@ -1,6 +1,6 @@
 import { Mesh, MeshBasicMaterial, MeshMatcapMaterial, Object3D, PlaneGeometry, TextureLoader } from 'three'
 import BendManager from '../managers/BendManager'
-import { MeshNormalNodeMaterial } from 'three/webgpu'
+import { color, MeshLambertNodeMaterial, MeshNormalNodeMaterial } from 'three/webgpu'
 import { vertexBendNode } from '../tsl/utils'
 const SIZE = 200
 const FACES = 100
@@ -27,7 +27,7 @@ export default class Floor extends Object3D {
 	}
 
 	_createMaterial() {
-		this.material = new MeshNormalNodeMaterial({ wireframe: true })
+		this.material = new MeshLambertNodeMaterial({ wireframe: false, color: 'white' })
 
 		this.material.vertexNode = vertexBendNode()
 		// this.material = new MeshBasicMaterial({ color:'red' })

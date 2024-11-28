@@ -10,7 +10,7 @@ class BendManager {
 	backY = uniform(settings.backY)
 	radius = 500
 	progress = uniform(0)
-	deep = uniform(0)
+	deep = uniform(0.22)
 
 	copy = () => {
 		const settings = {
