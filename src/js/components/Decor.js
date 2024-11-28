@@ -1,13 +1,8 @@
 import { BatchedMesh, Group, MathUtils, Mesh, MeshBasicMaterial, MeshMatcapMaterial, Object3D, PlaneGeometry, TextureLoader } from 'three'
 import LoaderManager from '@/js/managers/LoaderManager'
-import BendManager from '../managers/BendManager'
 import { CircleGeometry, MeshNormalNodeMaterial, MeshStandardNodeMaterial, varying, vec3 } from 'three/webgpu'
-import { vertexBendBatchedNode, vertexBendNode, vertexBendSphereNode } from '../tsl/utils'
+import { vertexBendBatchedNode, vertexBendNode } from '../tsl/utils'
 import { physicalToStandardMatNode } from '../tsl/physicalToStandard'
-
-const GEOMETRY = new PlaneGeometry(BendManager.radius, BendManager.radius, 32, 32)
-// const GEOMETRY = new CircleGeometry(BendManager.radius, 32)
-GEOMETRY.rotateX(-Math.PI / 2)
 
 export default class Decor extends Group {
 	material

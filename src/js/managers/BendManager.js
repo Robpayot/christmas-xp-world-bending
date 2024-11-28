@@ -8,7 +8,7 @@ class BendManager {
 	backX = uniform(settings.backX)
 	powerY = uniform(settings.powerY)
 	backY = uniform(settings.backY)
-	radius = 50
+	radius = 500
 	progress = uniform(0)
 	deep = uniform(1.5)
 

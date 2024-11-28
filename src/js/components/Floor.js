@@ -1,10 +1,10 @@
 import { Mesh, MeshBasicMaterial, MeshMatcapMaterial, Object3D, PlaneGeometry, TextureLoader } from 'three'
-import LoaderManager from '@/js/managers/LoaderManager'
 import BendManager from '../managers/BendManager'
-import { CircleGeometry, MeshNormalNodeMaterial, MeshStandardNodeMaterial } from 'three/webgpu'
-import { vertexBendNode, vertexBendSphereNode } from '../tsl/utils'
-
-const GEOMETRY = new PlaneGeometry(BendManager.radius, BendManager.radius, 32, 32)
+import { MeshNormalNodeMaterial } from 'three/webgpu'
+import { vertexBendNode } from '../tsl/utils'
+const SIZE = 200
+const FACES = 100
+const GEOMETRY = new PlaneGeometry(SIZE, SIZE, FACES, FACES)
 // const GEOMETRY = new CircleGeometry(BendManager.radius, 32)
 GEOMETRY.rotateX(-Math.PI / 2)
 
@@ -35,6 +35,7 @@ export default class Floor extends Object3D {
 
 	_createMesh() {
 		const mesh = new Mesh(GEOMETRY, this.material)
+		// mesh.scale.set(10, 1, 10)
 		this.add(mesh)
 	}
 
