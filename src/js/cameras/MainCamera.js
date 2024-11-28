@@ -1,34 +1,20 @@
 import { PerspectiveCamera } from 'three'
 
 export default class MainCamera {
-	#settings
-	#scene
+	settings
+	scene
 	camera
 	index = 0
-	#instance
-	#name
+	instance
+	name
 
-	constructor({ scene, settings, renderer }) {
-		this.#scene = scene
-		this.#settings = settings
+	constructor({ scene, settings, renderer, debug }) {
+		this.debugContainer = debug
+		this.scene = scene
+		this.settings = settings
 
 		// Setup
-		this.#instance = this._createInstance()
-	}
-
-	/**
-   * Getters & Setters
-   */
-	get name() {
-		return this.#name
-	}
-
-	set name(value) {
-		this.#name = value
-	}
-
-	get instance() {
-		return this.#instance
+		this.instance = this._createInstance()
 	}
 
 	/**
@@ -36,13 +22,13 @@ export default class MainCamera {
    */
 	_createInstance() {
 		const aspectRatio = window.innerWidth / window.innerHeight
-		console.log(this.#settings)
-		const fieldOfView = this.#settings.fov
+		console.log(this.settings)
+		const fieldOfView = this.settings.fov
 		const nearPlane = 0.1
 		const farPlane = 10000
 
 		const instance = new PerspectiveCamera(fieldOfView, aspectRatio, nearPlane, farPlane)
-		instance.position.copy(this.#settings.position)
+		instance.position.copy(this.settings.position)
 		instance.lookAt(0, 0, 0)
 
 		return instance
@@ -60,20 +46,21 @@ export default class MainCamera {
 	}
 
 	show() {
-		// this._showDebug()
+		console.log('show')
+		this._showDebug()
 	}
 
 	hide() {
-		// this._hideDebug()
+		this._hideDebug()
 	}
 
 	// handleMouseMove = (e) => {
 	//   const { x, y } = e.detail
-	//   const forceX = this.#rotateForceX
-	//   const forceY = this.#rotateForceY
+	//   const forceX = this.rotateForceX
+	//   const forceY = this.rotateForceY
 
-	//   this.#targetRotateX = y * forceX
-	//   this.#targetRotateY = -x * forceY
+	//   this.targetRotateX = y * forceX
+	//   this.targetRotateY = -x * forceY
 	// }
 
 	update(deltaTime) {
@@ -83,17 +70,17 @@ export default class MainCamera {
 	}
 
 	mouseMoveCamera(deltaTime) {
-		// if (this.camera.rotation.x !== degToRad(this.#targetRotateX)) {
-		//   this.camera.rotation.x = lerp(this.camera.rotation.x, degToRad(this.#targetRotateX), this.#coefRotate * deltaTime)
+		// if (this.camera.rotation.x !== degToRad(this.targetRotateX)) {
+		//   this.camera.rotation.x = lerp(this.camera.rotation.x, degToRad(this.targetRotateX), this.coefRotate * deltaTime)
 		// }
-		// if (this.camera.rotation.y !== degToRad(this.#targetRotateY)) {
-		//   this.camera.rotation.y = lerp(this.camera.rotation.y, degToRad(this.#targetRotateY), this.#coefRotate * deltaTime)
+		// if (this.camera.rotation.y !== degToRad(this.targetRotateY)) {
+		//   this.camera.rotation.y = lerp(this.camera.rotation.y, degToRad(this.targetRotateY), this.coefRotate * deltaTime)
 		// }
 	}
 
 	resize({ width, height }) {
-		this.#instance.aspect = width / height
-		this.#instance.updateProjectionMatrix()
+		this.instance.aspect = width / height
+		this.instance.updateProjectionMatrix()
 	}
 
 	destroy() {
@@ -115,7 +102,7 @@ export default class MainCamera {
 			frustum: { min: this.instance.near, max: this.instance.far },
 		}
 
-		this.debug = this.debugContainer.addFolder({ title: 'Main' })
+		this.debug = this.debugContainer.addFolder({ title: 'Main Camera' })
 		this.debug.addBinding(props, 'frustum', { min: 0.01, max: 5000, step: 1 }).on('change', () => {
 			this.instance.near = 0.1
 			this.instance.far = props.frustum.max
@@ -124,8 +111,8 @@ export default class MainCamera {
 		this.debug.addBinding(this.instance, 'fov', { min: 1, max: 180 }).on('change', updateCamera)
 		this.debug.addBinding(this.instance, 'position').on('change', updateCamera)
 		this.debug.addButton({ title: 'Save position' }).on('click', () => {
-			navigator.clipboard.writeText(JSON.stringify(this.#instance.position))
-			console.log('copied to clipboard', this.#instance.position)
+			navigator.clipboard.writeText(JSON.stringify(this.instance.position))
+			console.log('copied to clipboard', this.instance.position)
 		})
 	}
 

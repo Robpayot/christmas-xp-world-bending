@@ -2,41 +2,34 @@
 import Debugger from '@/js/managers/Debugger'
 
 export default class CameraManager {
-	#config
-	#renderer
-	#scene
-	#cameras
-	#active
-	#isEnabled
-	#debug
-	#settings
+	config
+	renderer
+	scene
+	cameras
+	active
+	isEnabled
+	debug
+	settings
 	constructor({ config, renderer, scene, cameras, settings }) {
 		// Options
-		this.#config = config
-		this.#renderer = renderer
-		this.#scene = scene
-		this.#cameras = cameras
-		this.#settings = settings
+		this.config = config
+		this.renderer = renderer
+		this.scene = scene
+		this.cameras = cameras
+		this.settings = settings
 
 		// Props
-		this.#active = null
-		this.#isEnabled = false
+		this.active = null
+		this.isEnabled = false
 
 		// Setup
-		this.#debug = this._createDebug()
-		this.#cameras = this._createCameras()
+		this.debug = this._createDebug()
+		this.cameras = this._createCameras()
 		this._setupDebugTypes()
 	}
 
 	destroy() {
 		this._destroyCameras()
-	}
-
-	/**
-   * Getters & Setters
-   */
-	get active() {
-		return this.#active
 	}
 
 	/**
@@ -47,30 +40,30 @@ export default class CameraManager {
 	}
 
 	enable() {
-		this.#isEnabled = true
-		this.#active?.enable()
+		this.isEnabled = true
+		this.active?.enable()
 	}
 
 	disable() {
-		this.#isEnabled = false
-		this.#active?.disable()
+		this.isEnabled = false
+		this.active?.disable()
 	}
 
 	activate(name) {
-		if (this.#active && this.#active.name === name) return
+		if (this.active && this.active.name === name) return
 
-		this.#active?.hide()
-		this.#active?.disable()
+		this.active?.hide()
+		this.active?.disable()
 
 		const camera = this.get(name)
 		if (camera) {
-			this.#active = camera
-			this.#active.enable()
-			this.#active.show()
+			this.active = camera
+			this.active.enable()
+			this.active.show()
 			// this.dispatchEvent('change', camera)
 		}
 
-		this._updateDebugCamera(this.#active)
+		this._updateDebugCamera(this.active)
 	}
 
 	/**
@@ -78,12 +71,12 @@ export default class CameraManager {
    */
 	_createCameras() {
 		const createdCameras = []
-		this.#cameras.forEach((camera) => {
+		this.cameras.forEach((camera) => {
 			console.log(camera)
 			const options = {
-				debug: this.#debug,
-				renderer: this.#renderer,
-				scene: this.#scene,
+				debug: this.debug,
+				renderer: this.renderer,
+				scene: this.scene,
 				settings: camera.settings,
 			}
 
@@ -96,23 +89,23 @@ export default class CameraManager {
 	}
 
 	_getCamera(name) {
-		return this.#cameras.find((camera) => camera.name === name)
+		return this.cameras.find((camera) => camera.name === name)
 	}
 
 	_destroyCameras() {
-		this.#cameras.forEach((camera) => {
+		this.cameras.forEach((camera) => {
 			if (typeof camera.destroy === 'function') camera.destroy()
 		})
-		this.#cameras = null
+		this.cameras = null
 	}
 
 	/**
    * Update
    */
 	update({ time, delta }) {
-		if (!this.#isEnabled) return
+		if (!this.isEnabled) return
 
-		this.#cameras.forEach((camera) => {
+		this.cameras.forEach((camera) => {
 			if (typeof camera.update === 'function') camera.update({ time, delta })
 		})
 	}
@@ -121,7 +114,7 @@ export default class CameraManager {
    * Resize
    */
 	resize(width, height) {
-		this.#cameras.forEach((camera) => camera.resize(width, height))
+		this.cameras.forEach((camera) => camera.resize(width, height))
 	}
 
 	/**
@@ -129,19 +122,19 @@ export default class CameraManager {
    */
 	_createDebug() {
 		if (!Debugger) return
-		const debug = Debugger.addFolder({ title: 'Cameras', tab: this.#config.name })
+		const debug = Debugger.addFolder({ title: 'Cameras', tab: this.config.name })
 		return debug
 	}
 
 	_setupDebugTypes() {
-		if (!this.#debug) return
+		if (!this.debug) return
 
 		const options = {}
-		this.#cameras.forEach((camera) => {
+		this.cameras.forEach((camera) => {
 			options[camera.name] = camera.name
 		})
 
-		this.#debug
+		this.debug
 			.addBlade({
 				view: 'list',
 				label: 'camera',
@@ -154,8 +147,8 @@ export default class CameraManager {
 	}
 
 	_updateDebugCamera(camera) {
-		if (!this.#debug) return
-		const debug = this.#debug.children.find((child) => child.label === 'camera')
+		if (!this.debug) return
+		const debug = this.debug.children.find((child) => child.label === 'camera')
 		debug.value = camera.name
 	}
 }

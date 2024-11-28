@@ -3,7 +3,8 @@ import { PerspectiveCamera, Vector3 } from 'three'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 
 // Constants
-const DEFAULT_POSITION = new Vector3(50, 20, 0)
+export const DEFAULT_POSITION = new Vector3(0, 4, 18)
+export const CONTROL_TARGET = new Vector3(0, 3, 0)
 
 export default class OrbitCamera {
 	debugContainer
@@ -30,6 +31,7 @@ export default class OrbitCamera {
 		// Setup
 		this.instance = this._createInstance()
 		this.controls = this._createControls()
+
 	}
 
 	/**
@@ -63,7 +65,7 @@ export default class OrbitCamera {
 		const farPlane = 10000
 
 		const instance = new PerspectiveCamera(fieldOfView, aspectRatio, nearPlane, farPlane)
-		instance.position.copy(this.settings.position)
+		instance.position.copy(DEFAULT_POSITION)
 		instance.lookAt(0, 0, 0)
 
 		return instance
@@ -74,12 +76,9 @@ export default class OrbitCamera {
 		controls.screenSpacePanning = true
 		controls.enabled = false
 
-		const savedTarget = JSON.parse(localStorage.getItem('camera-orbit-target'))
-		if (savedTarget) {
-			controls.target.x = savedTarget.x
-			controls.target.y = savedTarget.y
-			controls.target.z = savedTarget.z
-		}
+		controls.target.x = CONTROL_TARGET.x
+		controls.target.y = CONTROL_TARGET.y
+		controls.target.z = CONTROL_TARGET.z
 
 		controls.update()
 
@@ -120,6 +119,9 @@ export default class OrbitCamera {
 		this.debug.addButton({ title: 'Save position' }).on('click', () => {
 			localStorage.setItem('camera-orbit-position', JSON.stringify(this.instance.position))
 			localStorage.setItem('camera-orbit-target', JSON.stringify(this.controls.target))
+			navigator.clipboard.writeText(JSON.stringify(this.instance.position, this.controls.target))
+			console.log('copied to clipboard', this.instance.position, this.controls.target)
+
 		})
 		this.debug.addButton({ title: 'Reset position' }).on('click', () => {
 			localStorage.removeItem('camera-orbit-position')
