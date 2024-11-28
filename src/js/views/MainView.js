@@ -47,8 +47,9 @@ export default class MainView {
 		uColorB: uniform(new Color(this.skySettings.uColorB)),
 		uColorC: uniform(new Color(this.skySettings.uColorC))
 	}
-	constructor({ config, renderer }) {
+	constructor({ debug, config, renderer }) {
 		// Options
+		this.debugContainer = debug
 		this.config = config
 		this.renderer = renderer
 

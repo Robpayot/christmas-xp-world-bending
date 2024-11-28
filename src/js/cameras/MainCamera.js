@@ -59,9 +59,13 @@ export default class MainCamera {
 		this._isEnabled = false
 	}
 
-	show() {}
+	show() {
+		// this._showDebug()
+	}
 
-	hide() {}
+	hide() {
+		// this._hideDebug()
+	}
 
 	// handleMouseMove = (e) => {
 	//   const { x, y } = e.detail
@@ -94,5 +98,38 @@ export default class MainCamera {
 
 	destroy() {
 		this.events(false)
+	}
+
+	/**
+   * Debug
+   */
+	_showDebug() {
+		if (!this.debugContainer) return
+
+		const _this = this
+		function updateCamera() {
+			_this.instance.updateProjectionMatrix()
+		}
+
+		const props = {
+			frustum: { min: this.instance.near, max: this.instance.far },
+		}
+
+		this.debug = this.debugContainer.addFolder({ title: 'Main' })
+		this.debug.addBinding(props, 'frustum', { min: 0.01, max: 5000, step: 1 }).on('change', () => {
+			this.instance.near = 0.1
+			this.instance.far = props.frustum.max
+			updateCamera()
+		})
+		this.debug.addBinding(this.instance, 'fov', { min: 1, max: 180 }).on('change', updateCamera)
+		this.debug.addBinding(this.instance, 'position').on('change', updateCamera)
+		this.debug.addButton({ title: 'Save position' }).on('click', () => {
+			navigator.clipboard.writeText(JSON.stringify(this.#instance.position))
+			console.log('copied to clipboard', this.#instance.position)
+		})
+	}
+
+	_hideDebug() {
+		this.debug?.dispose()
 	}
 }
