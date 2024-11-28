@@ -3,6 +3,7 @@ import LoaderManager from '@/js/managers/LoaderManager'
 import { CircleGeometry, MeshNormalNodeMaterial, MeshStandardNodeMaterial, varying, vec3 } from 'three/webgpu'
 import { vertexBendBatchedNode, vertexBendNode } from '../tsl/utils'
 import { physicalToStandardMatNode } from '../tsl/physicalToStandard'
+import TilesManager, { TILE_SIZE } from '../managers/TilesManager'
 // import { Z_DISAPPEAR } from '../managers/TilesManager'
 
 export default class Decor extends Group {
@@ -14,10 +15,12 @@ export default class Decor extends Group {
 	}
 	instances = []
 	decorGeos = []
-	nbDecor = 50
+	nbDecor = 200
 	totalGeo = 0
 	totalInstance = 0
 	speed = 0.015
+	tiles = []
+
 	constructor({ debug }) {
 		super()
 
@@ -38,7 +41,7 @@ export default class Decor extends Group {
 				if (child.material.isMeshPhysicalMaterial || child.material.isMeshStandardMaterial) {
 					child.material = physicalToStandardMatNode(child.material)
 				}
-				const indices =  child.geometry.index.count
+				const indices = child.geometry.index.count
 				const vertices = child.geometry.attributes.position.count
 				info.maxIndices += indices
 				info.maxVertices += vertices
@@ -50,17 +53,7 @@ export default class Decor extends Group {
 
 		this.mesh = this._createMesh(info.maxVertices, info.maxIndices, scene.children[0].material)
 		this._addGeometries(this.decorGeos)
-		this._addInstances(this.decorGeos)
-
-		// Bounding sphere separation
-
-		// for (let i = 0; i < geometries.length; i++) {
-		// 	const geometry = geometries[i]
-		// 	mesh.addGeometry(geometry)
-		// }
-
-		// this._createMaterial()
-		// this._createMesh()
+		this._addInstances()
 
 		this._createDebugFolder()
 	}
@@ -99,63 +92,52 @@ export default class Decor extends Group {
 	}
 
 	_addInstances() {
-
-		const dummy = new Object3D()
 		let x = -1
 		let z = 0
-		// for (let i = 0; i < this.nbDecor; i++) {
-		// 	x *= -1
-		// 	const id = MathUtils.randInt(0, this.decorGeos.length - 1)
-		// 	this.mesh.addInstance(id) // id
-		// 	const dist = 4.5 / 2 + this.decorGeos[id].boundingSphere.radius + MathUtils.randFloat(-.5, 7)
-		// 	dummy.position.set(0, 0, z)
-		// 	dummy.rotation.set(0, MathUtils.randFloat() * Math.PI * 2, 0)
-		// 	dummy.scale.set(.9, .9, .9)
-		// 	dummy.updateMatrix()
-		// 	this.mesh.setMatrixAt(i, dummy.matrix)
-		// 	// z += 1 / this.nbDecor
-		// }
 
 		for (let i = 0; i < this.nbDecor; i++) {
 			x *= -1
-			const geoId = MathUtils.randInt(0, this.baseGeoCount - 1)
-			this.mesh.addInstance(i)
 
 			const dummy = new Object3D()
-			const id = MathUtils.randInt(0, this.decorGeos.length - 1)
+			const geoId = MathUtils.randInt(0, this.decorGeos.length - 1)
 
-			const dist = 4.5 / 2 + this.decorGeos[id].boundingSphere.radius + MathUtils.randFloat(-.5, 7)
+			this.mesh.addInstance(geoId)
+
+			const dist = 4.5 / 2 + this.decorGeos[geoId].boundingSphere.radius + MathUtils.randFloat(-.5, 7)
 			dummy.position.set(x * dist, 0, z)
-			// dummy.position.set(x * dist, 0, z)
-			// dummy.rotation.set(0, random() * Math.PI * 2, 0)
-			// dummy.scale.set(.9, .9, .9)
-			// dummy.rotation.set(0, MathUtils.randFloat() * Math.PI * 2, 0)
-			// dummy.scale.set(.9, .9, .9)
-			// dummy.position.copy(BACTH_FIX_DEF_POS) // TODO: check
 			dummy.updateMatrix()
 			this.mesh.setMatrixAt(i, dummy.matrix)
+			this.mesh.setVisibleAt(i, false)
 			this.instances.push({ id: i, geometryId: geoId, dummy })
 
-			z -= 50 / this.nbDecor
+			z -= TILE_SIZE / (this.nbDecor * 2)
 
 			this.totalInstance++
 		}
 
-		// const hLength = Math.ceil(this.instances.length / 2)
+		const hLength = Math.ceil(this.instances.length / 2)
 
-		// this.tiles[0] = this.instances.slice(0, hLength)
-		// this.tiles[1] = this.instances.slice(hLength, this.instances.length)
+		this.tiles[0] = this.instances.slice(0, hLength)
+		this.tiles[1] = this.instances.slice(hLength, this.instances.length)
 	}
 
 	/**
 	 * Update
 	 */
-	update({ time, delta }) {
+	update({ delta }) {
 
-		for (let i = 0; i < this.instances.length; i++) {
-			const { dummy, id } = this.instances[i]
+		// Move groups
+		// Group 1 / 2
+		this.updateTilesPosition(this.tiles[0], delta)
+		this.updateTilesPosition(this.tiles[1], delta)
 
-			dummy.position.z += delta * this.speed// update
+	}
+
+	updateTilesPosition(tiles, delta) {
+		for (let i = 0; i < tiles.length; i++) {
+			const { dummy, id } = tiles[i]
+
+			dummy.position.z += delta * TilesManager.speed// update
 			// console.log(dummy.position.z)
 
 			// if (dummy.position.z < Z_DISAPPEAR) {
@@ -168,6 +150,43 @@ export default class Decor extends Group {
 			this.mesh.setMatrixAt(id, dummy.matrix)
 
 		}
+	}
+
+	updateTiles(index, initDisplay) {
+
+		// clear group
+		const group = this.tiles[index]
+		// fill it
+		const startZ = initDisplay ? 0  : TILE_SIZE
+		const incrZ = 2
+
+		// const startZ = initDisplay ? 0 : TILE_SIZE  // from 0 to 100 or 100 to 200
+		// const endZ = initDisplay ? TILE_SIZE + 1 : TILE_SIZE * 2
+
+		// const incrItem = { val: 0 }
+		let x = -1
+		const z = incrZ
+
+		const endZ = initDisplay ? TILE_SIZE + 1 : TILE_SIZE * 2
+		let i = 0
+
+		for (let z = startZ; z < endZ; z += incrZ) {
+			x *= -1
+			const { dummy, id } = group[i]
+			const geoId = MathUtils.randInt(0, this.decorGeos.length - 1)
+
+			const dist = 4.5 / 2 + this.decorGeos[geoId].boundingSphere.radius + MathUtils.randFloat(-.5, 7)
+			dummy.position.set(x * dist, 0, -z)
+			dummy.updateMatrix()
+
+			this.mesh.setGeometryIdAt(id, geoId)
+			this.mesh.setMatrixAt(id, dummy.matrix)
+			this.mesh.setVisibleAt(id, true)
+			i++
+
+			// z -= TILE_SIZE / (this.nbDecor * 2)
+		}
+
 	}
 
 	resize({ width, height }) {}

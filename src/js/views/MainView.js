@@ -23,6 +23,7 @@ import {
 } from 'three/webgpu'
 import Floor from '../components/Floor'
 import Decor from '../components/Decor'
+import TilesManager from '../managers/TilesManager'
 
 export default class MainView {
 	config
@@ -65,6 +66,7 @@ export default class MainView {
 		this.lights = this._createLights()
 
 		this.debugFolder = this._createDebugFolder()
+		TilesManager.initEntities({ decor: this.components.decor })
 
 		// update renderOrders
 		// this._updateRenderOrder()
@@ -187,6 +189,7 @@ export default class MainView {
 	 */
 	update({ time, delta }) {
 		this._updateComponents({ time, delta })
+		TilesManager.update({ time, delta })
 		this.cameraManager.update({ time, delta })
 	}
 

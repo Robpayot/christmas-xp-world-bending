@@ -1,7 +1,6 @@
 // TODO: Seeds
 
 // import { playMusic } from "@/playSound"
-import { GAMEPLAY } from "../settings/gameplay"
 
 export const TILE_SIZE = 100 // 200
 export const Z_DISAPPEAR = -10
@@ -20,7 +19,7 @@ class TilesManager {
 	current = 1
 	univers = 0
 	lastUnivers = 0
-	stepUnivers = GAMEPLAY.univers_step
+	speed = 0.03
 	constructor() {
 
 	}
@@ -28,17 +27,18 @@ class TilesManager {
 	initEntities({ decor }) {
 		this.decor = decor
 
+		this.add(true)
+
 	}
 
 	update({ time, delta }) {
+		const speed = delta * this.speed
 
-		this.z -= delta
+		this.z -= speed
 
 		if (this.z < 0) {
 			this.add()
 		}
-
-		this.decor.update(delta)
 
 	}
 
@@ -47,9 +47,11 @@ class TilesManager {
 		// remove last tile and create a new one, push it back (z = range)
 		this.z = TILE_SIZE
 
+		console.log(this.index)
+
 		if (initDisplay) {
-			this.decor.updateTiles(0, true, true) // from 0 to 100
-			this.decor.updateTiles(1, false, true)  // from 100 to 200
+			this.decor.updateTiles(0, true) // from 0 to 100
+			this.decor.updateTiles(1, false)  // from 100 to 200
 		} else {
 			this.decor.updateTiles(this.index)
 
