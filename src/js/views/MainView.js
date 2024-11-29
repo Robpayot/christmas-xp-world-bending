@@ -24,6 +24,7 @@ import {
 import Floor from '../components/Floor'
 import Decor from '../components/Decor'
 import TilesManager from '../managers/TilesManager'
+import BendManager from '../managers/BendManager'
 
 export default class MainView {
 	config
@@ -58,7 +59,7 @@ export default class MainView {
 		// replace with LoaderManager
 		// this._resourceManager = this._createResourceManager()
 		this.scene = this._createScene()
-		this.cameraManager = this._createCameraManager()
+		this.cameraManager = this._initCameraManager()
 		this.components = null
 
 		// After loading
@@ -102,8 +103,8 @@ export default class MainView {
 		return scene
 	}
 
-	_createCameraManager() {
-		const cameraManager = new CameraManager({
+	_initCameraManager() {
+		CameraManager.init({
 			scene: this.scene,
 			config: this.config,
 			renderer: this.renderer,
@@ -121,9 +122,9 @@ export default class MainView {
 			],
 		})
 
-		cameraManager.activate(settings.camera.default)
+		CameraManager.activate(settings.camera.default)
 
-		return cameraManager
+		return CameraManager
 	}
 
 	/**
@@ -190,6 +191,7 @@ export default class MainView {
 	update({ time, delta }) {
 		this._updateComponents({ time, delta })
 		TilesManager.update({ time, delta })
+		BendManager.update({ time, delta })
 		this.cameraManager.update({ time, delta })
 	}
 

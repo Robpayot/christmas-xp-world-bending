@@ -1,5 +1,7 @@
 // TODO: Seeds
 
+import BendManager from "./BendManager"
+
 // import { playMusic } from "@/playSound"
 
 export const TILE_SIZE = 200 // 200
@@ -20,7 +22,6 @@ class TilesManager {
 	current = 1
 	univers = 0
 	lastUnivers = 0
-	speed = 0.03
 	constructor() {
 
 	}
@@ -33,7 +34,7 @@ class TilesManager {
 	}
 
 	update({ time, delta }) {
-		const speed = delta * this.speed
+		const speed = delta * BendManager.speed
 
 		this.z -= speed
 

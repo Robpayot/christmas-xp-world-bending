@@ -22,7 +22,6 @@ export default class MainCamera {
    */
 	_createInstance() {
 		const aspectRatio = window.innerWidth / window.innerHeight
-		console.log(this.settings)
 		const fieldOfView = this.settings.fov
 		const nearPlane = 0.1
 		const farPlane = 10000

@@ -32,6 +32,8 @@ export default class OrbitCamera {
 		this.instance = this._createInstance()
 		this.controls = this._createControls()
 
+		this.disable()
+
 	}
 
 	/**
@@ -43,7 +45,7 @@ export default class OrbitCamera {
 	}
 
 	disable() {
-		this.isEnabled = true
+		this.isEnabled = false
 		this.controls.enabled = false
 	}
 
@@ -116,6 +118,14 @@ export default class OrbitCamera {
 		})
 		this.debug.addBinding(this.instance, 'fov', { min: 1, max: 180 }).on('change', updateCamera)
 		this.debug.addBinding(this.instance, 'zoom').on('change', updateCamera)
+
+		this.debug.addBinding(this, 'isEnabled').on('change', (e) => {
+			if (e.value === true) {
+				this.enable()
+			} else {
+				this.disable()
+			}
+		})
 		this.debug.addButton({ title: 'Save position' }).on('click', () => {
 			localStorage.setItem('camera-orbit-position', JSON.stringify(this.instance.position))
 			localStorage.setItem('camera-orbit-target', JSON.stringify(this.controls.target))
@@ -123,14 +133,15 @@ export default class OrbitCamera {
 			console.log('copied to clipboard', this.instance.position, this.controls.target)
 
 		})
-		this.debug.addButton({ title: 'Reset position' }).on('click', () => {
-			localStorage.removeItem('camera-orbit-position')
-			localStorage.removeItem('camera-orbit-target')
+		// this.debug.addButton({ title: 'Reset position' }).on('click', () => {
+		// 	localStorage.removeItem('camera-orbit-position')
+		// 	localStorage.removeItem('camera-orbit-target')
 
-			this.instance.position.copy(DEFAULT_POSITION)
-			this.controls.target.set(0, 0, 0)
-			this.controls.update()
-		})
+		// 	this.instance.position.copy(DEFAULT_POSITION)
+		// 	this.controls.target.set(0, 0, 0)
+		// 	this.controls.update()
+		// })
+
 	}
 
 	_hideDebug() {

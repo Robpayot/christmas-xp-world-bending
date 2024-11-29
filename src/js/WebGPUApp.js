@@ -48,7 +48,6 @@ export default class WebGPUApp {
 			isReady: this.afterInit
 		})
 
-		console.log('là')
 		// this.composer = this._createComposer()
 
 	}

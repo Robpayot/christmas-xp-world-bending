@@ -36,8 +36,8 @@ export const vertexBendNode = () =>
 */
 export const getBend = (worldPos) => {
 
-	const zCurve = abs(worldPos.z.mul(worldPos.z.mul(BendManager.deep).mul(0.01)))
-	const xCurve = abs(worldPos.x.mul(worldPos.x.mul(BendManager.deep).mul(0.01)))
+	const zCurve = abs(worldPos.z.mul(worldPos.z.mul(BendManager.bend).mul(0.01)))
+	const xCurve = abs(worldPos.x.mul(worldPos.x.mul(BendManager.bend).mul(0.01)))
 
 	return zCurve.add(xCurve)
 }

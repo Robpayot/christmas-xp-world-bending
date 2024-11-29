@@ -4,6 +4,7 @@ import { CircleGeometry, MeshNormalNodeMaterial, MeshStandardNodeMaterial, varyi
 import { vertexBendBatchedNode, vertexBendNode } from '../tsl/utils'
 import { physicalToStandardMatNode } from '../tsl/physicalToStandard'
 import TilesManager, { TILE_SIZE, TILE_WIDE } from '../managers/TilesManager'
+import BendManager from '../managers/BendManager'
 // import { Z_DISAPPEAR } from '../managers/TilesManager'
 
 export default class Decor extends Group {
@@ -137,7 +138,7 @@ export default class Decor extends Group {
 		for (let i = 0; i < tiles.length; i++) {
 			const { dummy, id } = tiles[i]
 
-			dummy.position.z += delta * TilesManager.speed// update
+			dummy.position.z += delta * BendManager.speed// update
 			// console.log(dummy.position.z)
 
 			// if (dummy.position.z < Z_DISAPPEAR) {

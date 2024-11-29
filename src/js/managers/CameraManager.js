@@ -1,7 +1,7 @@
 // Modules
 import Debugger from '@/js/managers/Debugger'
 
-export default class CameraManager {
+class CameraManager {
 	config
 	renderer
 	scene
@@ -10,7 +10,11 @@ export default class CameraManager {
 	isEnabled
 	debug
 	settings
-	constructor({ config, renderer, scene, cameras, settings }) {
+	constructor() {
+
+	}
+
+	init({ config, renderer, scene, cameras, settings }) {
 		// Options
 		this.config = config
 		this.renderer = renderer
@@ -58,7 +62,7 @@ export default class CameraManager {
 		const camera = this.get(name)
 		if (camera) {
 			this.active = camera
-			this.active.enable()
+			// this.active.enable()
 			this.active.show()
 			// this.dispatchEvent('change', camera)
 		}
@@ -72,7 +76,6 @@ export default class CameraManager {
 	_createCameras() {
 		const createdCameras = []
 		this.cameras.forEach((camera) => {
-			console.log(camera)
 			const options = {
 				debug: this.debug,
 				renderer: this.renderer,
@@ -80,7 +83,6 @@ export default class CameraManager {
 				settings: camera.settings,
 			}
 
-			console.log(options)
 			const instance = new camera.camera(options)
 			instance.name = camera.name
 			createdCameras.push(instance)
@@ -152,3 +154,5 @@ export default class CameraManager {
 		debug.value = camera.name
 	}
 }
+
+export default new CameraManager()
