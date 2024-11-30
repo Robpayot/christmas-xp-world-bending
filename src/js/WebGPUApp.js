@@ -146,11 +146,11 @@ export default class WebGPUApp {
 	/**
    * Update cycle
    */
-	_tick() {
+	_tick(time, delta) {
 		if (!this.isActive) return
 
 		this.stats?.begin()
-		this._update()
+		this._update(time, delta)
 		this._render()
 		this.stats?.end()
 
@@ -159,10 +159,7 @@ export default class WebGPUApp {
 		// R.P.: Continue to reset info in production to fix an issue using webworkers
 	}
 
-	_update() {
-		// call all components updates
-		const delta = this.clock.getDelta() * 1000
-		const time = this.clock.getElapsedTime()
+	_update(time, delta) {
 		// TODO: update all views
 		const view = this.views.main
 		view?.update({ time, delta })
@@ -216,8 +213,8 @@ export default class WebGPUApp {
 		this._resize()
 	}
 
-	_tickHandler = () => {
-		this._tick()
+	_tickHandler = (time, delta) => {
+		this._tick(time, delta)
 	}
 
 	_visibilityChangeHandler = () => {

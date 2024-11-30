@@ -39,6 +39,8 @@ class BendManager {
 
 		window.addEventListener('DOMMouseScroll', this._handleScroll, false) // for Firefox
 		window.addEventListener('mousewheel',  this._handleScroll, false)
+		this.h1 = document.querySelector('h1')
+
 	}
 
 	/**
@@ -82,7 +84,11 @@ class BendManager {
 		// this.scrollStrenght +=
 
 		// this.scrollIncr = Math.max(0, (this.scrollIncr * this.scrollCoef) * delta)// reset scroll force
-		this.scrollIncr = Math.max(0, (this.scrollIncr - this.scrollResetForce * delta))// reset scroll force
+		this.scrollIncr =  Math.max(0, (this.scrollIncr - this.scrollResetForce * delta))// reset scroll force
+
+		// console.log(this.scrollIncr)
+
+		this.h1.innerHTML = this.scrollIncr
 
 		const targetBend = this.scrollIncr * this.scrollCoef
 
