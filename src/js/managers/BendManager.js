@@ -21,6 +21,7 @@ class BendManager {
 	scrollCoef = 0.116
 	lerp = 0.02
 	speedCoef = 340
+	targetBend = 0
 
 	copy = () => {
 		const settings = {
@@ -82,18 +83,20 @@ class BendManager {
 	update({ time, delta }) {
 
 		// this.scrollStrenght +=
+		// TODO: fix chrome with no devtool not updateing well the minus scrollResetForce, maybe to small numbers?
+		this.scrollIncr = Math.max(0, this.scrollIncr - this.scrollResetForce * delta)
 
 		// this.scrollIncr = Math.max(0, (this.scrollIncr * this.scrollCoef) * delta)// reset scroll force
-		this.scrollIncr =  Math.max(0, (this.scrollIncr - this.scrollResetForce * delta))// reset scroll force
+		// this.targetBend = Math.max(0, lerp(this.targetBend, (this.scrollIncr - this.scrollResetForce * delta), this.lerp))
+		// this.scrollIncr =  Math.max(0, (this.scrollIncr - this.scrollResetForce * delta))// reset scroll force
 
 		// console.log(this.scrollIncr)
 
+		this.targetBend =  Math.max(0, lerp(this.targetBend, this.scrollIncr, this.lerp))
 		this.h1.innerHTML = this.scrollIncr
 
-		const targetBend = this.scrollIncr * this.scrollCoef
-
 		// this.speed = this.initSpeed + this.scrollIncr / this.speedCoef
-		this.bend.value = clamp(lerp(this.bend.value, targetBend, this.lerp), 0, this.maxBend)
+		this.bend.value = clamp(this.targetBend * this.scrollCoef, 0, this.maxBend)
 
 	}
 

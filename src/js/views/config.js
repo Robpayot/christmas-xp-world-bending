@@ -17,7 +17,7 @@ export default {
 		{
 			name: 'decor',
 			type: 'gltf',
-			path: '/models/pack_assets.glb'
+			path: './models/pack_assets.glb'
 		}
 	],
 }

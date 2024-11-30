@@ -15,7 +15,7 @@ class LoaderManager {
 		this.DRACOLoader = new DRACOLoader()
 		this.FontLoader = new FontLoader()
 
-		this.DRACOLoader.setDecoderPath('/libs/draco/')
+		this.DRACOLoader.setDecoderPath('./libs/draco/')
 		this.DRACOLoader.setDecoderConfig({ type: 'wasm' })
 		this.GLTFLoader.setDRACOLoader(this.DRACOLoader)
 	}
