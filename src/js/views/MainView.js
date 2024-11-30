@@ -19,12 +19,13 @@ import {
 	Color,
 	AmbientLight,
 	DirectionalLight,
-	Scene
+	Scene,
 } from 'three/webgpu'
 import Floor from '../components/Floor'
 import Decor from '../components/Decor'
 import TilesManager from '../managers/TilesManager'
 import BendManager from '../managers/BendManager'
+import Sphere from '../components/Sphere'
 
 export default class MainView {
 	config
@@ -133,9 +134,9 @@ export default class MainView {
 	_createComponents() {
 		const components = {}
 		// this.scene.add(ResourceLoader.get('watercolor/scene').scene)
-		// components.sphere = this._addComp(Sphere)
+		components.sphere = this._addComp(Sphere)
 		components.floor = this._addComp(Floor)
-		components.decor = this._addComp(Decor)
+		// components.decor = this._addComp(Decor)
 
 		return components
 	}

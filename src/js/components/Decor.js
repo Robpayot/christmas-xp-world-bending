@@ -29,7 +29,7 @@ export default class Decor extends Group {
 
 		// Keep small assets
 		for (let i = 100; i >= 0; i--) { //
-			scene.remove(scene.children[i])
+			// scene.remove(scene.children[i])
 		}
 
 		this.debug = debug
@@ -41,13 +41,16 @@ export default class Decor extends Group {
 
 				if (child.material.isMeshPhysicalMaterial || child.material.isMeshStandardMaterial) {
 					child.material = physicalToStandardMatNode(child.material)
+					child.material.flatShading = false
+					// console.log(child.material)
+
 				}
 				const indices = child.geometry.index.count
 				const vertices = child.geometry.attributes.position.count
 				info.maxIndices += indices
 				info.maxVertices += vertices
 				child.geometry.computeBoundingSphere()
-				child.geometry.computeVertexNormals()
+				// child.geometry.computeVertexNormals()
 				this.decorGeos.push(child.geometry)
 			}
 		}
@@ -57,13 +60,6 @@ export default class Decor extends Group {
 		this._addInstances()
 
 		this._createDebugFolder()
-	}
-
-	_createMaterial() {
-		this.material = new MeshNormalNodeMaterial({ wireframe: true })
-
-		this.material.vertexNode = vertexBendNode()
-		// this.material = new MeshBasicMaterial({ color:'red' })
 	}
 
 	_createMesh(maxVertices, maxIndices, material) {
@@ -78,6 +74,11 @@ export default class Decor extends Group {
 
 		// if (bendMode.value) {
 		material.vertexNode = vertexBendBatchedNode(mesh, varWorldPos, varNormalLocal)
+		material.flatShading = true
+
+		material.needsUpdate = true
+
+		console.log(material)
 		// 	material.normalNode = transformNormalToView(varNormalLocal) // Fix normals, issue on instancedMesh and Batched
 		// 	material.outputNode = fragmentFogNode(varWorldPos)
 		// }

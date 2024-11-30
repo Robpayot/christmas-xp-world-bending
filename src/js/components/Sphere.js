@@ -1,6 +1,7 @@
 import { Mesh, MeshBasicMaterial, MeshMatcapMaterial, Object3D, SphereGeometry, TextureLoader } from 'three'
 import LoaderManager from '@/js/managers/LoaderManager'
 import { MeshLambertNodeMaterial, MeshStandardNodeMaterial } from 'three/webgpu'
+import { BufferGeometryUtils } from 'three/examples/jsm/Addons.js'
 
 const SPHERE_GEOMETRY = new SphereGeometry(1, 32, 32)
 
@@ -13,7 +14,7 @@ export default class Sphere extends Object3D {
 	}
 	constructor({ debug }) {
 		super()
-
+		console.log('ici')
 		this.debug = debug
 
 		this._createMaterial()
@@ -24,11 +25,16 @@ export default class Sphere extends Object3D {
 
 	_createMaterial() {
 		this.material = new MeshLambertNodeMaterial()
+		this.material.flatShading = false
 		// this.material = new MeshBasicMaterial({ color:'red' })
 	}
 
 	_createMesh() {
-		const mesh = new Mesh(SPHERE_GEOMETRY, this.material)
+		const scene  = LoaderManager.get('decor').scene
+		const child = scene.children[0]
+		const geometry = BufferGeometryUtils.mergeVertices(child.geometry, 0.5)
+		geometry.computeVertexNormals(true)
+		const mesh = new Mesh(geometry, this.material)
 		this.add(mesh)
 	}
 

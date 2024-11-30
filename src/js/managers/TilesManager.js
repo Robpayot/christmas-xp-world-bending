@@ -52,10 +52,10 @@ class TilesManager {
 		console.log(this.index)
 
 		if (initDisplay) {
-			this.decor.updateTiles(0, true) // from 0 to 100
-			this.decor.updateTiles(1, false)  // from 100 to 200
+			this.decor?.updateTiles(0, true) // from 0 to 100
+			this.decor?.updateTiles(1, false)  // from 100 to 200
 		} else {
-			this.decor.updateTiles(this.index)
+			this.decor?.updateTiles(this.index)
 
 			this.index++
 			if (this.index > 1) {

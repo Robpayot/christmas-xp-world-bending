@@ -86,7 +86,7 @@ class BendManager {
 
 		const targetBend = this.scrollIncr * this.scrollCoef
 
-		this.speed = this.initSpeed + this.scrollIncr / this.speedCoef
+		// this.speed = this.initSpeed + this.scrollIncr / this.speedCoef
 		this.bend.value = clamp(lerp(this.bend.value, targetBend, this.lerp), 0, this.maxBend)
 
 	}
