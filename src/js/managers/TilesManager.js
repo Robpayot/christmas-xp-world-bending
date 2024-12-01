@@ -49,7 +49,7 @@ class TilesManager {
 		// remove last tile and create a new one, push it back (z = range)
 		this.z = TILE_SIZE
 
-		console.log(this.index)
+		// console.log(this.index)
 
 		if (initDisplay) {
 			this.decor?.updateTiles(0, true) // from 0 to 100

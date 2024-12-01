@@ -69,8 +69,6 @@ export default class Renderer {
 		const renderer = new WebGPURenderer({
 			canvas: this.#canvas,
 			antialias: true,
-			powerPreference: 'high-performance',
-			logarithmicDepthBuffer: false,
 			alpha: false,
 		})
 		await renderer.init()
