@@ -26,6 +26,7 @@ export default class WebGPUApp {
 	statsGpuPanel
 	composer
 	activeView
+	lastTime = 0
 	constructor({ canvas, isDevelopment }) {
 		// Options
 		this.canvas = canvas
@@ -42,7 +43,6 @@ export default class WebGPUApp {
 		}
 		// Setup
 		// this._debug = this._createDebug()
-		this.clock = this._createClock()
 		this.renderer = new Renderer({
 			canvas: this.canvas,
 			isReady: this.afterInit
@@ -62,6 +62,7 @@ export default class WebGPUApp {
 		this._precompile()
 
 		this._events(true)
+		requestAnimationFrame(this._tick)
 		document.addEventListener('visibilitychange', this._visibilityChangeHandler)
 		this._resize()
 	}
@@ -85,13 +86,13 @@ export default class WebGPUApp {
    */
 
 	_events(method) {
-		const listener = method ? 'add' : 'remove'
+		// const listener = method ? 'add' : 'remove'
 		const eventListener = method ? 'addEventListener' : 'removeEventListener'
 
 		window[eventListener]('resize', this._resizeHandler)
 		window[eventListener]('deviceorientation', this._resizeHandler)
 		window[eventListener]('orientationchange', this._resizeHandler)
-		gsap.ticker[listener](this._tickHandler)
+		// gsap.ticker[listener](this._tickHandler)
 	}
 
 	_start() {
@@ -132,11 +133,6 @@ export default class WebGPUApp {
 		this.stats = null
 	}
 
-	_createClock() {
-		const clock = new Clock()
-		return clock
-	}
-
 	// _createComposer() {
 	//   const composer = new Composer()
 	//   bidello.registerGlobal('composer', composer)
@@ -146,23 +142,34 @@ export default class WebGPUApp {
 	/**
    * Update cycle
    */
-	_tick(time, delta) {
+
+	_tick = () => {
 		if (!this.isActive) return
 
-		this.stats?.begin()
-		this._update(time, delta)
-		this._render()
-		this.stats?.end()
+		const t = performance.now()
+		let dt = t - this.lastTime
+		this.lastTime = t
 
-		// if (this.isDevelopment && this.renderer) this.renderer.instance.info.reset()
-		// if (this.renderer) this.renderer.instance.info.reset()
-		// R.P.: Continue to reset info in production to fix an issue using webworkers
+		// Cap dt to prevent spiral of death
+		const MAX_DT = 100 // Adjust as needed
+		dt = Math.min(dt, MAX_DT)
+
+		this._update(t, dt)
+
+		requestAnimationFrame(this._tick)
+
 	}
 
 	_update(time, delta) {
+		this.stats?.begin()
+
 		// TODO: update all views
 		const view = this.views.main
 		view?.update({ time, delta })
+
+		this._render()
+
+		this.stats?.end()
 		// this._triggerBidelloUpdate()
 	}
 
@@ -211,10 +218,6 @@ export default class WebGPUApp {
    */
 	_resizeHandler = () => {
 		this._resize()
-	}
-
-	_tickHandler = (time, delta) => {
-		this._tick(time, delta)
 	}
 
 	_visibilityChangeHandler = () => {

@@ -2,6 +2,7 @@ import { uniform } from 'three/webgpu'
 import Debugger from '@/js/managers/Debugger'
 import { lerp, clamp } from 'three/src/math/MathUtils.js'
 import CameraManager from './CameraManager'
+import { roundTo } from '../utils/math'
 
 const settings = { powerX: 28.8, backX: 0.12, powerY: 54.2, backY: 1.7 }
 
@@ -22,6 +23,8 @@ class BendManager {
 	lerp = 0.02
 	speedCoef = 340
 	targetBend = 0
+	test = 0
+	resetForce = 0
 
 	copy = () => {
 		const settings = {
@@ -75,22 +78,18 @@ class BendManager {
 	_handleScroll = (evt) => {
 		if (CameraManager.active.isEnabled) return
 		this.direction = (evt.detail < 0 || evt.wheelDelta > 0) ? 1 : -1
-		this.scrollIncr += Math.abs(this.direction)
+		this.scrollIncr = this.scrollIncr + Math.abs(this.direction)
 
 		// Use the value as you will
 	}
 
 	update({ time, delta }) {
 
+		const total = this.scrollIncr + this.resetForce
+
 		// this.scrollStrenght +=
 		// TODO: fix chrome with no devtool not updateing well the minus scrollResetForce, maybe to small numbers?
-		this.scrollIncr = Math.max(0, this.scrollIncr - this.scrollResetForce * delta)
-
-		// this.scrollIncr = Math.max(0, (this.scrollIncr * this.scrollCoef) * delta)// reset scroll force
-		// this.targetBend = Math.max(0, lerp(this.targetBend, (this.scrollIncr - this.scrollResetForce * delta), this.lerp))
-		// this.scrollIncr =  Math.max(0, (this.scrollIncr - this.scrollResetForce * delta))// reset scroll force
-
-		// console.log(this.scrollIncr)
+		this.scrollIncr = Math.max(0, roundTo((this.scrollIncr - this.scrollResetForce * delta) * 1000, 3) / 1000)
 
 		this.targetBend =  Math.max(0, lerp(this.targetBend, this.scrollIncr, this.lerp))
 		this.h1.innerHTML = this.scrollIncr
