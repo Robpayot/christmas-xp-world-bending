@@ -15,9 +15,19 @@ export default {
 			path: "./img/matcap.png",
 		},
 		{
+			name: "texture_main",
+			type: "texture",
+			path: "./img/Textures1.png",
+		},
+		{
 			name: 'decor',
 			type: 'gltf',
-			path: './models/pack_assets.glb'
+			path: './models/pack_assets3.glb'
+		},
+		{
+			name: 'presents',
+			type: 'gltf',
+			path: './models/presents.glb'
 		}
 	],
 }

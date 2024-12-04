@@ -1,6 +1,6 @@
 import { BatchedMesh, Group, MathUtils, Mesh, MeshBasicMaterial, MeshMatcapMaterial, Object3D, PlaneGeometry, TextureLoader } from 'three'
 import LoaderManager from '@/js/managers/LoaderManager'
-import { CircleGeometry, MeshNormalNodeMaterial, MeshStandardNodeMaterial, varying, vec3, Vector3 } from 'three/webgpu'
+import { CircleGeometry, Matrix4, MeshNormalNodeMaterial, MeshStandardNodeMaterial, varying, vec3, Vector3 } from 'three/webgpu'
 import { vertexBendBatchedNode, vertexBendNode } from '../tsl/utils'
 import { physicalToStandardMatNode } from '../tsl/physicalToStandard'
 import TilesManager, { TILE_SIZE, TILE_WIDE } from '../managers/TilesManager'
@@ -16,16 +16,21 @@ export default class Decor extends Group {
 	}
 	instances = []
 	decorGeos = []
-	nbDecor = 2000
+	nbDecor = 3000
 	totalGeo = 0
 	totalInstance = 0
 	speed = 0.015
 	tiles = []
+	univers = 0
+	geoByUniverse = [[], [], []]
 
 	constructor({ debug }) {
 		super()
 
 		const scene  = LoaderManager.get('decor').scene
+		const mainTexture = LoaderManager.get('texture_main').texture
+		mainTexture.flipY = false
+		mainTexture.needsUpdate = true
 
 		// Keep small assets
 		for (let i = 100; i >= 0; i--) { //
@@ -34,26 +39,50 @@ export default class Decor extends Group {
 
 		this.debug = debug
 		const info = { maxIndices: 0, maxVertices: 0 }
+		let lastMaterial
+		const scaleGeo = 0.5
+
+		const addMeshInfo = (mesh) => {
+			if (mesh.material.isMeshPhysicalMaterial || mesh.material.isMeshStandardMaterial) {
+				mesh.material = physicalToStandardMatNode(mesh.material)
+				mesh.material.flatShading = false
+				// console.log(mesh.material)
+
+			}
+
+			// mesh.material.transparent = false // Ensure transparency is disabled if not intended
+			// mesh.material.needsUpdate = true
+
+			lastMaterial = mesh.material
+			const indices = mesh.geometry.index.count
+			const vertices = mesh.geometry.attributes.position.count
+			info.maxIndices += indices
+			info.maxVertices += vertices
+
+			mesh.material.map = mainTexture
+
+			const scalingMatrix = new Matrix4()
+			scalingMatrix.makeScale(scaleGeo, scaleGeo, scaleGeo) // Scale x, y, z by 2
+
+			// Apply the scaling matrix to the geometry
+			mesh.geometry.applyMatrix4(scalingMatrix)
+
+			mesh.geometry.computeBoundingSphere()
+			mesh.geometry.computeVertexNormals()
+			this.decorGeos.push({ geo: mesh.geometry, name: mesh.name })
+		}
 
 		for (let i = 0; i < scene.children.length; i++) {
 			const child = scene.children[i]
 			if (child.geometry) {
-
-				if (child.material.isMeshPhysicalMaterial || child.material.isMeshStandardMaterial) {
-					child.material = physicalToStandardMatNode(child.material)
-					child.material.flatShading = false
-					// console.log(child.material)
-
-				}
-				const indices = child.geometry.index.count
-				const vertices = child.geometry.attributes.position.count
-				info.maxIndices += indices
-				info.maxVertices += vertices
-				child.geometry.computeBoundingSphere()
-				// child.geometry.computeVertexNormals()
-				this.decorGeos.push(child.geometry)
+				addMeshInfo(child)
+			} else if (child.children[0]?.geometry) {
+				addMeshInfo(child.children[0])
 			}
 		}
+
+		// lastMaterial.map = null
+		console.log(scene.children[0])
 
 		this.mesh = this._createMesh(info.maxVertices, info.maxIndices, scene.children[0].material)
 		this._addGeometries(this.decorGeos)
@@ -78,7 +107,7 @@ export default class Decor extends Group {
 
 		material.needsUpdate = true
 
-		console.log(material)
+		// console.log(material)
 		// 	material.normalNode = transformNormalToView(varNormalLocal) // Fix normals, issue on instancedMesh and Batched
 		// 	material.outputNode = fragmentFogNode(varWorldPos)
 		// }
@@ -87,10 +116,28 @@ export default class Decor extends Group {
 
 	_addGeometries(geometries) {
 		for (let i = 0; i < geometries.length; i++) {
-			const geometry = geometries[i]
-			this.mesh.addGeometry(geometry)
+			const { geo, name } = geometries[i]
+			this.mesh.addGeometry(geo)
+			if (name.includes('fir_snow')) {
+				this.geoByUniverse[0].push(i)
+				if (name.includes('00')) {
+					this.geoByUniverse[1].push(i)
+					this.geoByUniverse[2].push(i)
+				}
+			} else if (name.includes('rock') || name.includes('stone_')) {
+				this.geoByUniverse[1].push(i)
+			} else {
+				this.geoByUniverse[2].push(i)
+			}
 			this.totalGeo++
 		}
+	}
+
+	getRandomGeoByUnivers(univers) {
+		const geosArr = this.geoByUniverse[univers]
+
+		const rd =  MathUtils.randInt(0, geosArr.length - 1)
+		return geosArr[rd]
 	}
 
 	_addInstances() {
@@ -101,12 +148,13 @@ export default class Decor extends Group {
 			x *= -1
 
 			const dummy = new Object3D()
-			const geoId = MathUtils.randInt(0, this.decorGeos.length - 1)
+			const geoId = this.getRandomGeoByUnivers(this.univers)
 
 			this.mesh.addInstance(geoId)
 
-			const dist = 4.5 / 2 + this.decorGeos[geoId].boundingSphere.radius + MathUtils.randFloat(-.5, 7)
+			const dist = 4.5 / 2 + this.decorGeos[geoId].geo.boundingSphere.radius + MathUtils.randFloat(-.5, 7)
 			dummy.position.set(x * dist, 0, z)
+			dummy.rotation.set(0, Math.PI * 2 * Math.random(), 0)
 			dummy.updateMatrix()
 			this.mesh.setMatrixAt(i, dummy.matrix)
 			this.mesh.setVisibleAt(i, false)
@@ -176,8 +224,8 @@ export default class Decor extends Group {
 
 		for (let i = 0; i < group.length; i++) {
 			const { dummy, id } = group[i]
-			const geoId = MathUtils.randInt(0, this.decorGeos.length - 1)
-			const radius = this.decorGeos[geoId].boundingSphere.radius // Assume boundingSphere is computed
+			const geoId = this.getRandomGeoByUnivers(this.univers)
+			const radius = this.decorGeos[geoId].geo.boundingSphere.radius // Assume boundingSphere is computed
 			let position = null // To store the valid position
 			const maxAttempts = 50 // Retry limit to avoid infinite loops
 
@@ -198,6 +246,7 @@ export default class Decor extends Group {
 				// Add to valid positions
 				positions.push({ position, radius })
 				dummy.position.copy(position)
+				dummy.rotation.set(0, Math.PI * 2 * Math.random(), 0)
 				dummy.updateMatrix()
 
 				this.mesh.setGeometryIdAt(id, geoId)
@@ -207,6 +256,11 @@ export default class Decor extends Group {
 				// console.warn('Failed to place a mesh without collision.')
 			}
 		}
+
+	}
+
+	changeUnivers(lastUnivers, univers) {
+		this.univers = univers
 
 	}
 

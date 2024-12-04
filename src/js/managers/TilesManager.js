@@ -22,6 +22,7 @@ class TilesManager {
 	current = 1
 	univers = 0
 	lastUnivers = 0
+	stepUnivers = 2
 	constructor() {
 
 	}
@@ -51,6 +52,10 @@ class TilesManager {
 
 		// console.log(this.index)
 
+		this.updateUnivers()
+
+		if (!initDisplay) this.current++
+
 		if (initDisplay) {
 			this.decor?.updateTiles(0, true) // from 0 to 100
 			this.decor?.updateTiles(1, false)  // from 100 to 200
@@ -68,15 +73,15 @@ class TilesManager {
 	}
 
 	updateUnivers() {
+		console.log('update unvie', this.current, this.stepUnivers)
 		if (this.current % this.stepUnivers === 0) { // every 3, TODO: better random
 
 			// change univers
 			this.univers = (this.univers + 1) % 3
 
 			if (this.lastUnivers !== this.univers) {
-				this.lane?.changeUnivers(this.lastUnivers, this.univers)
 				this.decor.changeUnivers(this.lastUnivers, this.univers)
-				this.changeMusic()
+				// this.changeMusic()
 			}
 		}
 	}

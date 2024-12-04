@@ -26,6 +26,7 @@ import Decor from '../components/Decor'
 import TilesManager from '../managers/TilesManager'
 import BendManager from '../managers/BendManager'
 import Sphere from '../components/Sphere'
+import Presents from '../components/Presents'
 
 export default class MainView {
 	config
@@ -137,6 +138,7 @@ export default class MainView {
 		// components.sphere = this._addComp(Sphere)
 		components.floor = this._addComp(Floor)
 		components.decor = this._addComp(Decor)
+		components.presents = this._addComp(Presents)
 
 		return components
 	}
