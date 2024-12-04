@@ -111,7 +111,7 @@ class BendManager {
 		this.targetBend =  Math.max(0, lerp(this.targetBend, Math.abs(this.deltaData.delta), this.lerp))
 
 		this.bend.value = clamp(this.targetBend * this.scrollCoef, 0, this.maxBend)
-		// this.speed = this.initSpeed + this.targetBend / this.speedCoef
+		this.speed = this.initSpeed + this.targetBend / this.speedCoef
 
 		if (!this.currentEvent) return
 
