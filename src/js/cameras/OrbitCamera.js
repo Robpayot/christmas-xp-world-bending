@@ -1,6 +1,8 @@
 // Vendor
 import { PerspectiveCamera, Vector3 } from 'three'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
+import BendManager from '../managers/BendManager'
+import { lerp } from 'three/src/math/MathUtils.js'
 
 // Constants
 export const DEFAULT_POSITION = new Vector3(0, 4, 18)
@@ -17,6 +19,8 @@ export default class OrbitCamera {
 	instance
 	controls
 	settings
+	bendFov = 0
+
 	debug
 	constructor({ debug, renderer, settings }) {
 		// Options
@@ -92,6 +96,12 @@ export default class OrbitCamera {
    */
 	resize({ width, height }) {
 		this.instance.aspect = width / height
+		this.instance.updateProjectionMatrix()
+	}
+
+	update({ time, delta }) {
+		this.bendFov = lerp(this.bendFov,  BendManager.bend.value * 14, 0.2)
+		this.instance.fov = this.settings.fov + this.bendFov
 		this.instance.updateProjectionMatrix()
 	}
 

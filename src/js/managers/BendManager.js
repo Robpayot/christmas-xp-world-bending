@@ -4,17 +4,11 @@ import { lerp, clamp } from 'three/src/math/MathUtils.js'
 import { roundTo } from '../utils/math'
 import { isFirefox, isMac, isSafari } from '../utils/detect'
 
-const settings = { powerX: 28.8, backX: 0.12, powerY: 54.2, backY: 1.7 }
-
 const FIREFOX_DELTA_MULTIPLIER = 0.9
 const SAFARI_DELTA_MULTIPLIER = 0.9
 const TIME_THRESHOLD = 200
 
 class BendManager {
-	powerX = uniform(settings.powerX)
-	backX = uniform(settings.backX)
-	powerY = uniform(settings.powerY)
-	backY = uniform(settings.backY)
 	radius = 500
 	progress = uniform(0)
 	bend = uniform(0.22)
@@ -31,17 +25,6 @@ class BendManager {
 	resetForce = 0
 	deltaData = {
 		delta: 0
-	}
-
-	copy = () => {
-		const settings = {
-			powerX: this.powerX.value,
-			backX: this.backX.value,
-			powerY: this.powerY.value,
-			backY: this.backY.value,
-		}
-		navigator.clipboard.writeText(JSON.stringify(settings))
-		console.log('copied to clipboard', settings)
 	}
 
 	// negCoef = uniform(1)
@@ -111,9 +94,17 @@ class BendManager {
 		this.targetBend =  Math.max(0, lerp(this.targetBend, Math.abs(this.deltaData.delta), this.lerp))
 
 		this.bend.value = clamp(this.targetBend * this.scrollCoef, 0, this.maxBend)
+		// increase speed
 		this.speed = this.initSpeed + this.targetBend / this.speedCoef
 
-		if (!this.currentEvent) return
+		// increase FOV
+
+		// back Santa
+
+		if (!this.currentEvent) {
+			this.deltaData.delta = 0
+			return
+		}
 
 		const now = Date.now()
 		const deltaData = this.currentEvent ? this.getDelta(this.currentEvent) : this.getDelta(this.previousEvent)

@@ -1,38 +1,42 @@
 import { BatchedMesh, Group, MathUtils, Mesh, MeshBasicMaterial, MeshMatcapMaterial, Object3D, PlaneGeometry, TextureLoader } from 'three'
 import LoaderManager from '@/js/managers/LoaderManager'
-import { CircleGeometry, Matrix4, MeshNormalNodeMaterial, MeshStandardNodeMaterial, varying, vec3, Vector3 } from 'three/webgpu'
-import { vertexBendBatchedNode, vertexBendNode } from '../tsl/utils'
-import { physicalToStandardMatNode } from '../tsl/physicalToStandard'
+import { CircleGeometry, Matrix4, MeshBasicNodeMaterial, MeshNormalNodeMaterial, MeshStandardNodeMaterial, SphereGeometry, varying, vec3, Vector3 } from 'three/webgpu'
 import BendManager from '../managers/BendManager'
+import MouseManager from '../managers/MouseManager'
+import { lerp } from 'three/src/math/MathUtils.js'
 // import { Z_DISAPPEAR } from '../managers/TilesManager'
 
 export default class Santa extends Group {
 	material
 	debug
+	initY = 5
+	minY = 4
+	bendZ = 0
+	targetPos = new Vector3(0, 8, -22)
 	settings = {
-		z: 0,
-		matcap: null,
+		coefX: 12,
+		coefY: 4,
+		lookAtX: 12,
+		lookAtY: 6
 	}
-	instances = []
-	decorGeos = []
-	nbDecor = 3000
-	totalGeo = 0
-	totalInstance = 0
-	speed = 0.015
-	tiles = []
-	univers = 0
-	geoByUniverse = [[], [], []]
 
 	constructor({ debug }) {
 		super()
 
-		const scene  = LoaderManager.get('santa_sleight').scene
+		this.debug = debug
 
-		this.add(scene)
+		this.mesh = LoaderManager.get('santa_sleight').scene
 
-		this.rotation.y = Math.PI / 2
+		this.add(this.mesh)
 
-		this.position.y = 5
+		this.mesh.position.y = this.initY
+
+		this.targetMesh = new Mesh(new SphereGeometry(1, 32, 32), new MeshBasicNodeMaterial({ color: 'red', wireframe: true }))
+		this.targetMesh.position.copy(this.targetPos)
+		this.targetMesh.visible = false
+		this.add(this.targetMesh)
+
+		this._createDebugFolder()
 
 		// for (let i = 0; i < scene.children.length; i++) {
 		// 	const child = scene.children[i]
@@ -49,8 +53,18 @@ export default class Santa extends Group {
 	 */
 	update({ delta }) {
 
-		// Move groups
-		// Group 1 / 2
+		this.mesh.position.x = MouseManager.x * this.settings.coefX
+		this.targetMesh.position.x = MouseManager.lookAtX * this.settings.lookAtX
+
+		this.mesh.position.y = MouseManager.y * this.settings.coefY + this.initY
+		// clamp to minY
+		this.mesh.position.y = Math.max(this.minY, this.mesh.position.y)
+		this.targetMesh.position.y = MouseManager.lookAtY * this.settings.lookAtY + this.targetPos.y
+
+		this.mesh.lookAt(this.targetMesh.position)
+
+		this.bendZ = lerp(this.bendZ,  BendManager.bend.value * 8, 0.2)
+		this.position.z = this.bendZ
 
 	}
 
@@ -62,13 +76,12 @@ export default class Santa extends Group {
 	_createDebugFolder() {
 		if (!this.debug) return
 
-		const settingsChangedHandler = () => {
-			this.position.z = this.settings.z
-		}
+		const debug = this.debug.addFolder({ title: 'Santa', expanded: true })
 
-		const debug = this.debug.addFolder({ title: 'Decor', expanded: true })
-
-		debug.addBinding(this.settings, 'z').on('change', settingsChangedHandler)
+		debug.addBinding(this.settings, 'coefX')
+		debug.addBinding(this.settings, 'coefY')
+		debug.addBinding(this.settings, 'lookAtX')
+		debug.addBinding(this.targetMesh, 'position')
 		// debug
 		//   .addBinding(this.material.matcap, 'image', {
 		//     label: 'Texture',

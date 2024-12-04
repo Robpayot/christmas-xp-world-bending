@@ -24,7 +24,7 @@ class CameraManager {
 
 		// Props
 		this.active = null
-		this.isEnabled = false
+		this.isEnabled = true
 
 		// Setup
 		this.debug = this._createDebug()

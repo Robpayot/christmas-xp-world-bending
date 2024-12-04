@@ -28,6 +28,7 @@ import BendManager from '../managers/BendManager'
 import Sphere from '../components/Sphere'
 import Presents from '../components/Presents'
 import Santa from '../components/Santa'
+import MouseManager from '../managers/MouseManager'
 
 export default class MainView {
 	config
@@ -65,11 +66,11 @@ export default class MainView {
 		this.cameraManager = this._initCameraManager()
 		this.components = null
 
+		this.lights = this._createLights()
+		this.debugFolder = this._createDebugFolder()
 		// After loading
 		this.components = this._createComponents()
-		this.lights = this._createLights()
 
-		this.debugFolder = this._createDebugFolder()
 		TilesManager.initEntities({ decor: this.components.decor })
 
 		// update renderOrders
@@ -197,6 +198,7 @@ export default class MainView {
 		this._updateComponents({ time, delta })
 		TilesManager.update({ time, delta })
 		BendManager.update({ time, delta })
+		MouseManager.update({ time, delta })
 		this.cameraManager.update({ time, delta })
 	}
 
