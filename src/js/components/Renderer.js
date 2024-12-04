@@ -118,7 +118,7 @@ export default class Renderer {
 	 * Resize
 	 */
 	resize({ width, height, dpr }) {
-		this.#instance?.setPixelRatio(dpr)
+		this.#instance?.setPixelRatio(window.devicePixelRatio)
 		this.#instance?.setSize(width, height)
 	}
 
