@@ -27,7 +27,7 @@ export default {
 		{
 			name: 'presents',
 			type: 'gltf',
-			path: './models/presents.glb'
+			path: './models/presents2.glb'
 		},
 		{
 			name: 'santa_sleight',

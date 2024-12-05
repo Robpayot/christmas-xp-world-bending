@@ -1,4 +1,4 @@
-import { uniform } from 'three/webgpu'
+import { uniform, Vector3 } from 'three/webgpu'
 import Debugger from '@/js/managers/Debugger'
 import { lerp, clamp } from 'three/src/math/MathUtils.js'
 import { roundTo } from '../utils/math'
@@ -26,6 +26,7 @@ class BendManager {
 	deltaData = {
 		delta: 0
 	}
+	santaPos = new Vector3()
 
 	// negCoef = uniform(1)
 	constructor() {
@@ -95,7 +96,7 @@ class BendManager {
 
 		this.bend.value = clamp(this.targetBend * this.scrollCoef, 0, this.maxBend)
 		// increase speed
-		this.speed = this.initSpeed + this.targetBend / this.speedCoef
+		// this.speed = this.initSpeed + this.targetBend / this.speedCoef
 
 		// increase FOV
 

@@ -1,0 +1,12 @@
+# Blender 4.2.2 LTS MTL File: 'presents.blend'
+# www.blender.org
+
+newmtl ribbon.005
+Ns 99.798592
+Ka 0.909091 0.909091 0.909091
+Kd 1.000000 0.325490 0.203922
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 3

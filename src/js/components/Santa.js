@@ -19,6 +19,7 @@ export default class Santa extends Group {
 		lookAtX: 12,
 		lookAtY: 6
 	}
+	santaWorldPos = new Vector3(0, 0, 0)
 
 	constructor({ debug }) {
 		super()
@@ -65,6 +66,10 @@ export default class Santa extends Group {
 
 		this.bendZ = lerp(this.bendZ,  BendManager.bend.value * 8, 0.2)
 		this.position.z = this.bendZ
+
+		this.mesh.getWorldPosition(this.santaWorldPos)
+
+		BendManager.santaPos.copy(this.santaWorldPos)
 
 	}
 
