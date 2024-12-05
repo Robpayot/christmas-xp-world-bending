@@ -16,12 +16,13 @@ export default class Presents extends Group {
 	nbPresents = 20
 	abstracts = []
 	minY = 1
+	meshes = []
 
 	constructor({ debug }) {
 		super()
 
 		const scene  = LoaderManager.get('presents').scene
-		// console.log(scene)
+		console.log(scene)
 
 		const obj1 = scene.getObjectByName('presentRoundRebuild')
 		const geo = obj1.geometry
@@ -31,36 +32,47 @@ export default class Presents extends Group {
 		geo.scale(s, s, s)
 		geo.computeBoundingBox()
 
-		const mat = new MeshStandardNodeMaterial({ map: obj1.material.map })
+		const mat1 = new MeshStandardNodeMaterial({ map: obj1.material.map })
 
-		this.mesh1 = new InstancedMesh(geo, mat, this.nbPresents)
-		this.mesh1.instanceMatrix.setUsage(DynamicDrawUsage)
+		const half = Math.floor(this.nbPresents / 2)
 
-		this.add(this.mesh1)
+		this.meshes[0] = new InstancedMesh(geo, mat1, half)
+		this.meshes[0].instanceMatrix.setUsage(DynamicDrawUsage)
+		this.meshes[0].frustumCulled = false
+		this.add(this.meshes[0])
+
+		const obj2 = scene.getObjectByName('presentGreen')
+		const geo2 = obj2.geometry
+
+		geo2.rotateX(Math.PI / 2)
+		geo2.scale(s, s, s)
+		geo2.computeBoundingBox()
+
+		const mat2 = new MeshStandardNodeMaterial({ map: obj2.material.map })
+
+		this.meshes[1] = new InstancedMesh(geo2, mat2, half)
+		this.meshes[1].instanceMatrix.setUsage(DynamicDrawUsage)
+		this.meshes[1].frustumCulled = false
+		this.add(this.meshes[1])
 
 		for (let i = 0; i < this.nbPresents; i++) {
+
+			const  meshIndex = i > half ? 0 : 1
 			const abstract = {
 				dummy: new Object3D(),
 				hitted: false,
 				active: false,
 				magnet: false,
-				index: i
+				index: i,
+				meshIndex
 			}
 			this.abstracts.push(abstract)
 			abstract.dummy.position.set(0, -100, 0)
 			abstract.dummy.updateMatrix()
-			this.mesh1.setMatrixAt(i, abstract.dummy.matrix)
+			console.log(i)
+
+			this.meshes[meshIndex].setMatrixAt(i, abstract.dummy.matrix)
 		}
-
-		this.mesh1.frustumCulled = false
-
-		// for (let i = 0; i < scene.children.length; i++) {
-		// 	const child = scene.children[i]
-		// 	console.log(child)
-		// 	// child.material = physicalToStandardMatNode(child.material)
-		// 	this.add(child)
-
-		// }
 
 		setInterval(() => {
 
@@ -74,6 +86,8 @@ export default class Presents extends Group {
 		for (let i = 0; i < this.abstracts.length; i++) {
 			const abstract = this.abstracts[i]
 			if (!abstract.active) {
+				const meshIndex = MathUtils.randInt(0, 1)
+				abstract.meshIndex = meshIndex
 				abstract.dummy.position.copy(BendManager.santaPos)
 				abstract.dummy.rotation.set(Math.random() * Math.PI * 2, Math.random() * Math.PI * 2, Math.random() * Math.PI * 2)
 				abstract.dummy.scale.set(1, 1, 1)
@@ -94,6 +108,7 @@ export default class Presents extends Group {
 	 * Update
 	 */
 	update({ delta }) {
+		if (!this.pause) return
 
 		// Move groups
 		// Group 1 / 2
@@ -119,7 +134,7 @@ export default class Presents extends Group {
 				}
 
 				abstract.dummy.updateMatrix()
-				this.mesh1.setMatrixAt(abstract.index, abstract.dummy.matrix)
+				this.meshes[abstract.meshIndex].setMatrixAt(abstract.index, abstract.dummy.matrix)
 			}
 
 		}
