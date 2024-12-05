@@ -38,13 +38,13 @@ export default class Santa extends Group {
 
 		this._createDebugFolder()
 
-		// for (let i = 0; i < scene.children.length; i++) {
-		// 	const child = scene.children[i]
-		// 	console.log(child)
-		// 	// child.material = physicalToStandardMatNode(child.material)
-		// 	this.add(child)
+		for (let i = 0; i < this.mesh.children.length; i++) {
+			const child = this.mesh.children[i]
+			console.log(child)
+			// child.material = physicalToStandardMatNode(child.material)
+			// this.add(child)
 
-		// }
+		}
 
 	}
 
