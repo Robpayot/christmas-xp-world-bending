@@ -57,7 +57,7 @@ export default class Presents extends Group {
 
 		for (let i = 0; i < this.nbPresents; i++) {
 
-			const  meshIndex = i > half ? 0 : 1
+			const  meshIndex = i >= half ? 0 : 1
 			const abstract = {
 				dummy: new Object3D(),
 				hitted: false,
@@ -108,7 +108,7 @@ export default class Presents extends Group {
 	 * Update
 	 */
 	update({ delta }) {
-		if (!this.pause) return
+		// if (!this.pause) return
 
 		// Move groups
 		// Group 1 / 2
