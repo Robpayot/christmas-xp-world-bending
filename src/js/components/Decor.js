@@ -188,14 +188,6 @@ export default class Decor extends Group {
 			const { dummy, id } = tiles[i]
 
 			dummy.position.z += delta * BendManager.speed// update
-			// console.log(dummy.position.z)
-
-			// if (dummy.position.z < Z_DISAPPEAR) {
-			// 	// hide to improve perf
-			// 	dummy.position.z = -1000
-			// 	this.mesh.setVisibleAt(id, false)
-			// }
-
 			dummy.updateMatrix()
 			this.mesh.setMatrixAt(id, dummy.matrix)
 

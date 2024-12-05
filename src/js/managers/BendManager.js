@@ -96,7 +96,7 @@ class BendManager {
 
 		this.bend.value = clamp(this.targetBend * this.scrollCoef, 0, this.maxBend)
 		// increase speed
-		// this.speed = this.initSpeed + this.targetBend / this.speedCoef
+		this.speed = this.initSpeed + this.targetBend / this.speedCoef
 
 		// increase FOV
 

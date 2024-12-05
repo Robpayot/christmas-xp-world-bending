@@ -1,9 +1,12 @@
 import { BatchedMesh, Group, MathUtils, Mesh, MeshBasicMaterial, MeshMatcapMaterial, Object3D, PlaneGeometry, TextureLoader } from 'three'
 import LoaderManager from '@/js/managers/LoaderManager'
-import { CircleGeometry, DynamicDrawUsage, InstancedMesh, Matrix4, MeshNormalNodeMaterial, MeshStandardNodeMaterial, MeshToonNodeMaterial, varying, vec3, Vector3 } from 'three/webgpu'
+import { abs, CircleGeometry, DynamicDrawUsage, InstancedMesh, Matrix4, MeshNormalNodeMaterial, MeshStandardNodeMaterial, MeshToonNodeMaterial, varying, vec3, Vector3 } from 'three/webgpu'
 import { vertexBendBatchedNode, vertexBendNode } from '../tsl/utils'
 import { physicalToStandardMatNode } from '../tsl/physicalToStandard'
 import BendManager from '../managers/BendManager'
+import gsap from 'gsap'
+import { dtAnimate } from '../utils/dtAnimate'
+import { easeOutQuad } from '../utils/easing'
 // import { Z_DISAPPEAR } from '../managers/TilesManager'
 
 export default class Presents extends Group {
@@ -22,64 +25,54 @@ export default class Presents extends Group {
 		super()
 
 		const scene  = LoaderManager.get('presents').scene
-		console.log(scene)
-
 		const obj1 = scene.getObjectByName('presentRoundRebuild')
-		const geo = obj1.geometry
+		const obj2 = scene.getObjectByName('presentGreen')
+
+		for (let i = 0; i < 2; i++) {
+			const obj = i === 0 ? obj1 : obj2
+			const mesh = this.createInstancedMesh(obj)
+			this.add(mesh)
+			this.meshes.push(mesh)
+		}
+
+		setInterval(() => {
+			this.drop()
+		}, 1000)
+	}
+
+	createInstancedMesh(obj) {
+		const geo = obj.geometry
 
 		geo.rotateX(Math.PI / 2)
 		const s = 2
 		geo.scale(s, s, s)
 		geo.computeBoundingBox()
 
-		const mat1 = new MeshStandardNodeMaterial({ map: obj1.material.map })
+		const mat = new MeshStandardNodeMaterial({ map: obj.material.map })
 
 		const half = Math.floor(this.nbPresents / 2)
 
-		this.meshes[0] = new InstancedMesh(geo, mat1, half)
-		this.meshes[0].instanceMatrix.setUsage(DynamicDrawUsage)
-		this.meshes[0].frustumCulled = false
-		this.add(this.meshes[0])
+		const mesh = new InstancedMesh(geo, mat, half)
+		mesh.instanceMatrix.setUsage(DynamicDrawUsage)
+		mesh.frustumCulled = false
 
-		const obj2 = scene.getObjectByName('presentGreen')
-		const geo2 = obj2.geometry
-
-		geo2.rotateX(Math.PI / 2)
-		geo2.scale(s, s, s)
-		geo2.computeBoundingBox()
-
-		const mat2 = new MeshStandardNodeMaterial({ map: obj2.material.map })
-
-		this.meshes[1] = new InstancedMesh(geo2, mat2, half)
-		this.meshes[1].instanceMatrix.setUsage(DynamicDrawUsage)
-		this.meshes[1].frustumCulled = false
-		this.add(this.meshes[1])
-
-		for (let i = 0; i < this.nbPresents; i++) {
-
-			const  meshIndex = i >= half ? 0 : 1
+		for (let i = 0; i < half; i++) {
 			const abstract = {
 				dummy: new Object3D(),
 				hitted: false,
 				active: false,
 				magnet: false,
 				index: i,
-				meshIndex
+				meshIndex: 0
 			}
 			this.abstracts.push(abstract)
 			abstract.dummy.position.set(0, -100, 0)
 			abstract.dummy.updateMatrix()
-			console.log(i)
 
-			this.meshes[meshIndex].setMatrixAt(i, abstract.dummy.matrix)
+			mesh.setMatrixAt(i, abstract.dummy.matrix)
 		}
 
-		setInterval(() => {
-
-			this.drop()
-
-		}, 1000)
-
+		return mesh
 	}
 
 	getFree = () => {
@@ -93,6 +86,26 @@ export default class Presents extends Group {
 				abstract.dummy.scale.set(1, 1, 1)
 				abstract.dummy.updateMatrix()
 				abstract.active = true
+
+				abstract.initPos = abstract.dummy.position.clone()
+
+				// impulse
+
+				abstract.animImpulseX = {
+					start: this.time,
+					from: 0,
+					to: MathUtils.randFloat(-2, 2), //  MathUtils.randFloat(4, 5) * force,
+					duration: 0.5,
+					easing: easeOutQuad
+				}
+
+				abstract.animImpulseY = {
+					start: this.time,
+					from: 0,
+					to: MathUtils.randFloat(6, 7), //  MathUtils.randFloat(4, 5) * force,
+					duration: 0.5,
+					easing: easeOutQuad
+				}
 				return abstract
 			}
 		}
@@ -107,7 +120,8 @@ export default class Presents extends Group {
 	/**
 	 * Update
 	 */
-	update({ delta }) {
+	update({ time, delta }) {
+		this.time = time / 1000
 		// if (!this.pause) return
 
 		// Move groups
@@ -116,10 +130,18 @@ export default class Presents extends Group {
 		for (let i = 0; i < this.abstracts.length; i++) {
 			const abstract = this.abstracts[i]
 			if (abstract.active) {
-				abstract.dummy.position.y -= 0.006 * delta
+
+				abstract.dummy.position.x = abstract.initPos.x + dtAnimate(this.time, abstract.animImpulseX)
+				abstract.dummy.position.y = abstract.initPos.y + dtAnimate(this.time, abstract.animImpulseY)
+				abstract.animImpulseY.to -= 0.01 * delta
+
+				// abstract.dummy.position.y -= 0.00 * delta
 				abstract.dummy.position.z += delta * BendManager.speed * 0.4
 				abstract.dummy.rotation.x += 0.004 * delta
 				abstract.dummy.rotation.y += 0.001 * delta
+
+				// apply impulse
+				abstract.impulse
 
 				if (abstract.dummy.position.y < this.minY) {
 					// reset
