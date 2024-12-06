@@ -9,7 +9,7 @@ import Debugger from '@/js/managers/Debugger'
 import Renderer from '@/js/components/Renderer'
 // import Composer from '@/js/webgl/modules/Composer'
 import MainView from './views/MainView'
-import Settings from './utils/Settings'
+import DeviceSettings from './utils/DeviceSettings'
 import LoaderManager from './managers/LoaderManager'
 import Stats from 'stats.js'
 
@@ -206,7 +206,7 @@ export default class WebGPUApp {
 	_resize() {
 		const width = (this.width = window.innerWidth)
 		const height = (this.height = window.innerHeight)
-		const dpr = (this.dpr = Settings.dpr)
+		const dpr = (this.dpr = DeviceSettings.dpr)
 		this.renderer.resize({ width, height, dpr })
 
 		// for each views

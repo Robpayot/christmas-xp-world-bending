@@ -7,7 +7,7 @@ import Debugger from '@/js/managers/Debugger'
 import MainCamera from '../cameras/MainCamera'
 import CameraManager from '../managers/CameraManager'
 import OrbitCamera from '../cameras/OrbitCamera'
-import settings from './settings'
+import SETTINGS from './settings'
 
 import {
 	uniform,
@@ -25,11 +25,11 @@ import Floor from '../components/Floor'
 import Decor from '../components/Decor'
 import TilesManager from '../managers/TilesManager'
 import BendManager from '../managers/BendManager'
-import Sphere from '../components/Sphere'
 import Presents from '../components/Presents'
 import Santa from '../components/Santa'
 import MouseManager from '../managers/MouseManager'
 import Horizon from '../components/Horizon'
+
 export default class MainView {
 	config
 	cameraManager
@@ -37,21 +37,21 @@ export default class MainView {
 	renderer
 	components
 	debugFolder
-	lightSettings = {
-		ambientColor: '#c4c4c4',
-		sunColor: '#5f6a7e'
+	lightDeviceSettings = {
+		ambientColor: '#b4b4b4',
+		sunColor: '#999188'
 	}
-	skySettings = {
+	skyDeviceSettings = {
 		uRangeA: uniform(0.22),
 		uRangeB: uniform(0.62),
 		uColorA: '#6472dd',
-		uColorB: '#4552bb',
+		uColorB: '#4050b8',
 		uColorC: '#141264'
 	}
 	skyUniforms = {
-		uColorA: uniform(new Color(this.skySettings.uColorA)),
-		uColorB: uniform(new Color(this.skySettings.uColorB)),
-		uColorC: uniform(new Color(this.skySettings.uColorC))
+		uColorA: uniform(new Color(this.skyDeviceSettings.uColorA)),
+		uColorB: uniform(new Color(this.skyDeviceSettings.uColorB)),
+		uColorC: uniform(new Color(this.skyDeviceSettings.uColorC))
 	}
 	constructor({ debug, config, renderer }) {
 		// Options
@@ -116,17 +116,17 @@ export default class MainView {
 				{
 					name: 'default',
 					camera: MainCamera,
-					settings: settings.camera,
+					settings: SETTINGS.camera,
 				},
 				{
 					name: 'orbit',
 					camera: OrbitCamera,
-					settings: settings.camera,
+					settings: SETTINGS.camera,
 				},
 			],
 		})
 
-		CameraManager.activate(settings.camera.default)
+		CameraManager.activate(SETTINGS.camera.default)
 
 		return CameraManager
 	}
@@ -167,11 +167,10 @@ export default class MainView {
 	}
 
 	_createLights() {
-		const sun = new DirectionalLight(this.lightSettings.sunColor, 30)
-		const ambient = new AmbientLight(this.lightSettings.ambientColor, 0.7) // Soft white light
+		const sun = new DirectionalLight(this.lightDeviceSettings.sunColor, 20)
+		const ambient = new AmbientLight(this.lightDeviceSettings.ambientColor, 0.7) // Soft white light
 		// there is an inversion on Decor X --> Y / Y --> X / Z --> Z
-		sun.position.set(-6.15, 2.68, -1.48)   // Position the sun
-
+		sun.position.set(-56, 17, -24)   // Position the sun
 		this.scene.add(ambient)
 		this.scene.add(sun)
 
@@ -185,8 +184,8 @@ export default class MainView {
 
 			//horizon
 			result.rgb = mix(result.rgb, this.skyUniforms.uColorA, smoothstep(0, 0.01, rangeY))
-			result.rgb = mix(result.rgb, this.skyUniforms.uColorB, smoothstep(0.01, this.skySettings.uRangeA, rangeY))
-			result.rgb = mix(result.rgb, this.skyUniforms.uColorC, smoothstep(this.skySettings.uRangeA, this.skySettings.uRangeB, rangeY))
+			result.rgb = mix(result.rgb, this.skyUniforms.uColorB, smoothstep(0.01, this.skyDeviceSettings.uRangeA, rangeY))
+			result.rgb = mix(result.rgb, this.skyUniforms.uColorC, smoothstep(this.skyDeviceSettings.uRangeA, this.skyDeviceSettings.uRangeB, rangeY))
 
 			return result
 		})()
@@ -249,34 +248,34 @@ export default class MainView {
 		const debugFolder = Debugger.addFolder({ title: `Scene ${this.config.name}`, expanded: true })
 
 		debugFolder.addBinding(this.lights.sun, "position")
-		debugFolder.addBinding(this.lightSettings, "ambientColor").on('change', () => {
-			this.lights.ambient.color = new Color(this.lightSettings.ambientColor)
+		debugFolder.addBinding(this.lightDeviceSettings, "ambientColor").on('change', () => {
+			this.lights.ambient.color = new Color(this.lightDeviceSettings.ambientColor)
 		})
-		debugFolder.addBinding(this.lightSettings, "sunColor").on('change', () => {
-			this.lights.sun.color = new Color(this.lightSettings.sunColor)
+		debugFolder.addBinding(this.lightDeviceSettings, "sunColor").on('change', () => {
+			this.lights.sun.color = new Color(this.lightDeviceSettings.sunColor)
 		})
 
 		const debugSky = Debugger.addFolder({ title: `Scene sky`, expanded: true })
 
-		debugSky.addBinding(this.skySettings, "uColorA").on('change', () => {
-			this.skyUniforms.uColorA.value = new Color(this.skySettings.uColorA)
+		debugSky.addBinding(this.skyDeviceSettings, "uColorA").on('change', () => {
+			this.skyUniforms.uColorA.value = new Color(this.skyDeviceSettings.uColorA)
 		})
-		debugSky.addBinding(this.skySettings, "uColorB").on('change', () => {
-			this.skyUniforms.uColorB.value = new Color(this.skySettings.uColorB)
+		debugSky.addBinding(this.skyDeviceSettings, "uColorB").on('change', () => {
+			this.skyUniforms.uColorB.value = new Color(this.skyDeviceSettings.uColorB)
 		})
-		debugSky.addBinding(this.skySettings, "uColorC").on('change', () => {
-			this.skyUniforms.uColorC.value = new Color(this.skySettings.uColorC)
+		debugSky.addBinding(this.skyDeviceSettings, "uColorC").on('change', () => {
+			this.skyUniforms.uColorC.value = new Color(this.skyDeviceSettings.uColorC)
 		})
-		debugSky.addBinding(this.skySettings.uRangeA, "value")
-		debugSky.addBinding(this.skySettings.uRangeB, "value")
+		debugSky.addBinding(this.skyDeviceSettings.uRangeA, "value")
+		debugSky.addBinding(this.skyDeviceSettings.uRangeB, "value")
 
 		const btn = debugSky.addButton({
 			title: 'Save',
 		})
 
 		btn.on('click', () => {
-			navigator.clipboard.writeText(JSON.stringify(this.skySettings))
-			console.log('copied to clipboard', this.skySettings)
+			navigator.clipboard.writeText(JSON.stringify(this.skyDeviceSettings))
+			console.log('copied to clipboard', this.skyDeviceSettings)
 		})
 
 		return debugFolder

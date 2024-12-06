@@ -1,7 +1,7 @@
 import { BatchedMesh, Group, MathUtils, Mesh, MeshBasicMaterial, MeshMatcapMaterial, Object3D, PlaneGeometry, TextureLoader } from 'three'
 import LoaderManager from '@/js/managers/LoaderManager'
-import { CircleGeometry, Matrix4, MeshNormalNodeMaterial, MeshStandardNodeMaterial, varying, vec3, Vector3 } from 'three/webgpu'
-import { vertexBendBatchedNode, vertexBendNode } from '../tsl/utils'
+import { CircleGeometry, Matrix4, MeshNormalNodeMaterial, MeshStandardNodeMaterial, transformNormalToView, varying, vec3, Vector3 } from 'three/webgpu'
+import { fragmentFogNode, vertexBendBatchedNode, vertexBendNode } from '../tsl/utils'
 import { physicalToStandardMatNode } from '../tsl/physicalToStandard'
 import TilesManager, { TILE_SIZE, TILE_WIDE } from '../managers/TilesManager'
 import BendManager from '../managers/BendManager'
@@ -23,6 +23,7 @@ export default class Decor extends Group {
 	tiles = []
 	univers = 0
 	geoByUniverse = [[], [], []]
+	minZ = 30
 
 	constructor({ debug }) {
 		super()
@@ -82,9 +83,8 @@ export default class Decor extends Group {
 		}
 
 		// lastMaterial.map = null
-		console.log(scene.children[0])
 
-		this.mesh = this._createMesh(info.maxVertices, info.maxIndices, scene.children[0].material)
+		this.mesh = this._createMesh(info.maxVertices, info.maxIndices, lastMaterial)
 		this._addGeometries(this.decorGeos)
 		this._addInstances()
 
@@ -93,17 +93,22 @@ export default class Decor extends Group {
 
 	_createMesh(maxVertices, maxIndices, material) {
 		const mesh = new BatchedMesh(this.nbDecor, maxVertices, maxIndices, material)
-		// mesh.perObjectFrustumCulled = perObjectFrustumCulled.value
-		// mesh.sortObjects = sortObjects.value
+		mesh.renderOrder = 100
+		mesh.perObjectFrustumCulled = true
+		mesh.sortObjects = true
 		this.add(mesh)
 
 		// WGSL
 		const varWorldPos = varying(vec3(0))
 		const varNormalLocal = varying(vec3(0))
 
+		material.transparent = true
+
 		// if (bendMode.value) {
 		material.vertexNode = vertexBendBatchedNode(mesh, varWorldPos, varNormalLocal)
-		material.flatShading = true
+		material.normalNode = transformNormalToView(varNormalLocal) // Fix normals, issue on instancedMesh and Batched
+		material.outputNode = fragmentFogNode(varWorldPos)
+		// material.flatShading = true
 
 		material.needsUpdate = true
 
@@ -188,6 +193,13 @@ export default class Decor extends Group {
 			const { dummy, id } = tiles[i]
 
 			dummy.position.z += delta * BendManager.speed// update
+
+			if (dummy.position.z > this.minZ) {
+				// make invisible
+				dummy.position.y = -1000
+				this.mesh.setVisibleAt(id, false)
+			}
+
 			dummy.updateMatrix()
 			this.mesh.setMatrixAt(id, dummy.matrix)
 

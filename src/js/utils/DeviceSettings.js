@@ -1,7 +1,7 @@
 import query from './query'
 import GPU from './gpu'
 
-class Settings {
+class DeviceSettings {
 	tier
 	dpr
 	hasParallax
@@ -19,7 +19,7 @@ class Settings {
 		Object.freeze(this)
 
 		console.log('–––––')
-		console.log('[Settings]', gpu)
+		console.log('[DeviceSettings]', gpu)
 		console.log('–––––')
 	}
 }
@@ -41,4 +41,4 @@ function getDPR(tier) {
 	return window.devicePixelRatio || 1
 }
 
-export default new Settings()
+export default new DeviceSettings()

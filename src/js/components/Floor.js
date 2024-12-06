@@ -1,11 +1,11 @@
 import { Mesh, MeshBasicMaterial, MeshMatcapMaterial, Object3D, PlaneGeometry, TextureLoader } from 'three'
-import BendManager from '../managers/BendManager'
 import { color, MeshLambertNodeMaterial, MeshNormalNodeMaterial } from 'three/webgpu'
 import { vertexBendNode } from '../tsl/utils'
+import SETTINGS from '../views/settings'
 
-export const SIZE = 200
+const SIZE = SETTINGS.world.size
 const FACES = 100
-const GEOMETRY = new PlaneGeometry(SIZE, SIZE, FACES, FACES)
+const GEOMETRY = new PlaneGeometry(SIZE * 2, SIZE, FACES, FACES)
 // const GEOMETRY = new CircleGeometry(BendManager.radius, 32)
 GEOMETRY.rotateX(-Math.PI / 2)
 

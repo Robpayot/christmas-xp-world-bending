@@ -1,22 +1,24 @@
-import { Mesh, MeshBasicMaterial, MeshMatcapMaterial, Object3D, PlaneGeometry, TextureLoader } from 'three'
-import BendManager from '../managers/BendManager'
-import { Color, color, MeshBasicNodeMaterial, MeshLambertNodeMaterial, MeshNormalNodeMaterial, pow, uniform, uv, vec3, vec4 } from 'three/webgpu'
+import { Color, pow, uniform, uv, vec3, vec4, Fn, Mesh, MeshBasicMaterial, Object3D, PlaneGeometry  } from 'three/webgpu'
 import { vertexBendNode } from '../tsl/utils'
-import { SIZE } from './Floor'
-import { Fn } from 'three/webgpu'
+import SETTINGS from '../views/settings'
+
+const SIZE = SETTINGS.world.size
 const FACES = 100 // TODO: optim
 const HEIGHT = 100
 const GEOMETRY = new PlaneGeometry(SIZE * 2, HEIGHT, FACES, FACES)
 
 GEOMETRY.translate(0, HEIGHT / 2, -SIZE / 2)
+
+const HORIZON_SETTINGS = {
+	COLOR: '#e7c5aa'
+}
+export const HORIZON_UCOLOR = uniform(new Color(HORIZON_SETTINGS.COLOR))
 export default class Horizon extends Object3D {
 	material
 	debug
-	color = '#cec0b6'
 	settings = {
 		stepMin: uniform(0.05),
 		pow: uniform(4.10),
-		uColor: uniform(new Color(this.color))
 	}
 	constructor({ debug }) {
 		super()
@@ -29,10 +31,11 @@ export default class Horizon extends Object3D {
 		this._createDebugFolder()
 
 		// this.position.z = -SIZE / 4
+		this.renderOrder = 0
 	}
 
 	_createMaterial() {
-		this.material = new MeshBasicMaterial({ wireframe: false, transparent: true })
+		this.material = new MeshBasicMaterial({ wireframe: false, transparent: true, depthWrite: false })
 
 		this.material.vertexNode = vertexBendNode()
 		this.material.colorNode = this.colorNode()
@@ -49,7 +52,7 @@ export default class Horizon extends Object3D {
 		return Fn(() => {
 			const y = uv().y.oneMinus().toVar()
 			y.assign(pow(y, this.settings.pow))
-			return vec4(this.settings.uColor, y.smoothstep(this.settings.stepMin, 1))
+			return vec4(HORIZON_UCOLOR, y.smoothstep(this.settings.stepMin, 1))
 		})()
 	}
 
@@ -70,8 +73,8 @@ export default class Horizon extends Object3D {
 
 		debug.addBinding(this.settings.stepMin, "value")
 		debug.addBinding(this.settings.pow, "value")
-		debug.addBinding(this, "color").on('change', () => {
-			this.settings.uColor.value = new Color(this.color)
+		debug.addBinding(HORIZON_SETTINGS, "COLOR").on('change', () => {
+			HORIZON_UCOLOR.value = new Color(HORIZON_SETTINGS.COLOR)
 		})
 		// debug
 		//   .addBinding(this.material.matcap, 'image', {

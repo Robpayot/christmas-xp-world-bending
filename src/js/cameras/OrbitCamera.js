@@ -67,8 +67,8 @@ export default class OrbitCamera {
 	_createInstance() {
 		const aspectRatio = window.innerWidth / window.innerHeight
 		const fieldOfView = this.settings.fov
-		const nearPlane = 0.1
-		const farPlane = 10000
+		const nearPlane = this.settings.near
+		const farPlane = this.settings.far
 
 		const instance = new PerspectiveCamera(fieldOfView, aspectRatio, nearPlane, farPlane)
 		instance.position.copy(DEFAULT_POSITION)
