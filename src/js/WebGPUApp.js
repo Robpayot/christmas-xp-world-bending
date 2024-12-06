@@ -112,7 +112,9 @@ export default class WebGPUApp {
 	// precompile shaders and materials
 	_precompile() {
 		const { scene, camera } = this.activeView
-		this.renderer.instance.compile(scene, camera)
+
+		// doesn't work for transparent material
+		// this.renderer.instance.compile(scene, camera)
 
 		// precompile textures
 		const textures = LoaderManager.textures

@@ -69,7 +69,7 @@ export default class Renderer {
 		const renderer = new WebGPURenderer({
 			canvas: this.#canvas,
 			antialias: true,
-			alpha: false,
+			// alpha: false,
 		})
 		await renderer.init()
 		const clearColor = new Color(0xffffff)

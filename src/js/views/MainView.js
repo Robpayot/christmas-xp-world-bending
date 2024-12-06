@@ -29,7 +29,7 @@ import Sphere from '../components/Sphere'
 import Presents from '../components/Presents'
 import Santa from '../components/Santa'
 import MouseManager from '../managers/MouseManager'
-
+import Horizon from '../components/Horizon'
 export default class MainView {
 	config
 	cameraManager
@@ -39,13 +39,13 @@ export default class MainView {
 	debugFolder
 	lightSettings = {
 		ambientColor: '#c4c4c4',
-		sunColor: '#587994'
+		sunColor: '#5f6a7e'
 	}
 	skySettings = {
-		uRangeA: uniform(0.19),
-		uRangeB: uniform(0.72),
-		uColorA: '#8aa2e7',
-		uColorB: '#6472dd',
+		uRangeA: uniform(0.22),
+		uRangeB: uniform(0.62),
+		uColorA: '#6472dd',
+		uColorB: '#4552bb',
 		uColorC: '#141264'
 	}
 	skyUniforms = {
@@ -139,6 +139,7 @@ export default class MainView {
 		// this.scene.add(ResourceLoader.get('watercolor/scene').scene)
 		// components.sphere = this._addComp(Sphere)
 		components.floor = this._addComp(Floor)
+		components.horizon = this._addComp(Horizon)
 		components.decor = this._addComp(Decor)
 		components.presents = this._addComp(Presents)
 		components.santa = this._addComp(Santa)
@@ -179,7 +180,7 @@ export default class MainView {
 
 	_skyNode() {
 		return Fn(() => {
-			const rangeY = normalWorld.y.smoothstep(-1, 1).sub(0.5).mul(2).abs()
+			const rangeY = normalWorld.y.smoothstep(-1, 1).sub(0.5).mul(2)
 			const result = this.skyUniforms.uColorA.toVar()
 
 			//horizon
