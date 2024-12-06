@@ -75,7 +75,7 @@ export default class Presents extends Group {
 		return mesh
 	}
 
-	getFree = () => {
+	getFree = (offset) => {
 		for (let i = 0; i < this.abstracts.length; i++) {
 			const abstract = this.abstracts[i]
 			if (!abstract.active) {
@@ -94,7 +94,7 @@ export default class Presents extends Group {
 				abstract.animImpulseX = {
 					start: this.time,
 					from: 0,
-					to: MathUtils.randFloat(-2, 2), //  MathUtils.randFloat(4, 5) * force,
+					to: MathUtils.randFloat(-1.5, 1.5) *  (offset + 2), //  MathUtils.randFloat(4, 5) * force,
 					duration: 0.5,
 					easing: easeOutQuad
 				}
@@ -113,7 +113,11 @@ export default class Presents extends Group {
 	}
 
 	drop() {
-		this.getFree()
+		const nb = MathUtils.randInt(1, 4)
+
+		for (let i = 0; i < nb; i++) {
+			this.getFree(i)
+		}
 
 	}
 

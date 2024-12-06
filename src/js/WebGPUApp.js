@@ -1,7 +1,3 @@
-// Vendor
-import { gsap } from 'gsap'
-import { Clock } from 'three'
-
 // Modules
 import Debugger from '@/js/managers/Debugger'
 // import Visibility from '@/js/modules/Visibility'
@@ -12,6 +8,7 @@ import MainView from './views/MainView'
 import DeviceSettings from './utils/DeviceSettings'
 import LoaderManager from './managers/LoaderManager'
 import Stats from 'stats.js'
+import { Mesh, PerspectiveCamera, PlaneGeometry, Scene } from 'three/webgpu'
 
 export default class WebGPUApp {
 	canvas
@@ -121,6 +118,69 @@ export default class WebGPUApp {
 		textures.forEach((texture) => {
 			// this.renderer.instance.initTexture(texture)
 		})
+	}
+
+	//---------------------------------------------------------- COMPILE
+	async gpuUpload(objects) {
+		this.compileScene = this.compileScene || new Scene()
+		this.compileCamera = this.compileCamera || new PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.0001, 10000)
+		this.compileCamera.position.set(0, 0, 10000)
+		this.compileCamera.lookAt(0, 0, 0)
+		this.compileGeometry = this.compileGeometry || new PlaneGeometry(1, 1)
+		this.compileScene.environment = this.scene.environment
+
+		const initialStates = []
+
+		for (const obj of objects) {
+			if (!obj) continue
+			if (obj.isLight) continue
+			if (obj.isCamera) continue
+			if (obj.isTexture) {
+				// console.log('[compile] add texture', obj)
+				obj.needsUpdate = true
+				this.renderer.initTexture?.(obj) // Error, initTexture is not a function
+			}
+			else if (obj.isMaterial) {
+				// console.log('[compile] add material', obj)
+				const mesh = new Mesh(this.compileGeometry, obj)
+				this.compileScene.add(mesh)
+				const maps = ['map', 'alphaMap', 'aoMap', 'bumpMap', 'displacementMap', 'emissiveMap', 'envMap', 'lightMap', 'metalnessMap', 'normalMap', 'roughnessMap']
+				for (const map of maps) {
+					if (obj[map]) {
+						this.renderer.initTexture(obj[map])
+					}
+				}
+			}
+			else if (obj.isObject3D) {
+				// console.log('[compile] add object', obj)
+				initialStates.push({
+					parent: obj.parent,
+					frustumCulled: obj.frustumCulled,
+				})
+				obj.frustumCulled = false
+				this.compileScene.add(obj)
+			}
+		}
+
+		await this.renderer.compileAsync(this.compileScene, this.compileCamera, this.scene)
+
+		let k = 0
+		for (const obj of objects) {
+			if (!obj) continue
+			if (obj.isLight) continue
+			if (obj.isCamera) continue
+			if (obj.isMaterial) continue
+			if (obj.isTexture) continue
+			if (initialStates[k]) {
+				if (initialStates[k].parent) {
+					initialStates[k].parent.add(obj)
+				}
+				obj.frustumCulled = initialStates[k].frustumCulled
+			}
+			k++
+		}
+
+		this.compileGeometry.dispose()
 	}
 
 	_createStats() {

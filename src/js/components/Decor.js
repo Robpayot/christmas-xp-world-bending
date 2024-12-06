@@ -63,7 +63,11 @@ export default class Decor extends Group {
 			mesh.material.map = mainTexture
 
 			const scalingMatrix = new Matrix4()
-			scalingMatrix.makeScale(scaleGeo, scaleGeo, scaleGeo) // Scale x, y, z by 2
+			let s = scaleGeo
+			if (mesh.name.includes('stone')) {
+				s = 1
+			}
+			scalingMatrix.makeScale(s, s, s) // Scale x, y, z by 2
 
 			// Apply the scaling matrix to the geometry
 			mesh.geometry.applyMatrix4(scalingMatrix)
@@ -125,11 +129,16 @@ export default class Decor extends Group {
 			this.mesh.addGeometry(geo)
 			if (name.includes('fir_snow')) {
 				this.geoByUniverse[0].push(i)
-				if (name.includes('00')) {
+
+				if (name.includes('007') || name.includes('008')) {
 					this.geoByUniverse[1].push(i)
+				}
+				if (name.includes('00')) {
 					this.geoByUniverse[2].push(i)
 				}
 			} else if (name.includes('rock') || name.includes('stone_')) {
+				this.geoByUniverse[1].push(i)
+			} else if (name.includes('dead')) {
 				this.geoByUniverse[1].push(i)
 			} else {
 				this.geoByUniverse[2].push(i)

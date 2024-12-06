@@ -3,6 +3,8 @@ import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js'
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js'
 import { RepeatWrapping, TextureLoader } from 'three'
+import { EquirectangularReflectionMapping } from 'three/webgpu'
+import { UltraHDRLoader } from 'three/examples/jsm/Addons.js'
 
 class LoaderManager {
 	assets
@@ -186,6 +188,16 @@ class LoaderManager {
 					console.log('An error happened', err)
 				}
 			)
+		})
+	}
+
+	async loadHDR() {
+		this.loaderHDR = this.loaderHDR || new UltraHDRLoader()
+		this.loaderHDR.load('/hdr/spruit_sunrise_512.hdr.jpg', (texture) => {
+			texture.mapping = EquirectangularReflectionMapping
+			// stage3d.scene.environment = texture
+			// stage3d.scene.environmentIntensity = 0.15
+			// stage3d.render()
 		})
 	}
 }

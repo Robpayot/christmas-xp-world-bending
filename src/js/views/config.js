@@ -22,7 +22,7 @@ export default {
 		{
 			name: 'decor',
 			type: 'gltf',
-			path: './models/pack_final.glb'
+			path: './models/pack_final2.glb'
 		},
 		{
 			name: 'presents',

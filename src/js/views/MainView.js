@@ -39,7 +39,7 @@ export default class MainView {
 	debugFolder
 	lightDeviceSettings = {
 		ambientColor: '#b4b4b4',
-		sunColor: '#999188'
+		sunColor: '#a5a5b6'
 	}
 	skyDeviceSettings = {
 		uRangeA: uniform(0.22),
@@ -167,10 +167,10 @@ export default class MainView {
 	}
 
 	_createLights() {
-		const sun = new DirectionalLight(this.lightDeviceSettings.sunColor, 20)
+		const sun = new DirectionalLight(this.lightDeviceSettings.sunColor, 5)
 		const ambient = new AmbientLight(this.lightDeviceSettings.ambientColor, 0.7) // Soft white light
 		// there is an inversion on Decor X --> Y / Y --> X / Z --> Z
-		sun.position.set(-56, 17, -12)   // Position the sun
+		sun.position.set(-56, 36, -12)   // Position the sun
 		this.scene.add(ambient)
 		this.scene.add(sun)
 
