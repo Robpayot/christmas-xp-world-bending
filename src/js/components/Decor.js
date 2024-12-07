@@ -205,7 +205,7 @@ export default class Decor extends Group {
 
 			if (dummy.position.z > this.minZ) {
 				// make invisible
-				dummy.position.y = -1000
+				dummy.position.y = -2000
 				this.mesh.setVisibleAt(id, false)
 			}
 

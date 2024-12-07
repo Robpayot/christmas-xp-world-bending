@@ -7,7 +7,7 @@ const SETTINGS = {
 		position: new Vector3(50, 50, 50),
 		fov: 60, // 83
 		near: 0.1,
-		far: 220,
+		far: 1020,
 	},
 	world: {
 		size: 200
