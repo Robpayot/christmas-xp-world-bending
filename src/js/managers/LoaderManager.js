@@ -60,6 +60,8 @@ class LoaderManager {
 					promises.push(this.loadFont(path, name))
 				} else if (type === 'obj') {
 					promises.push(this.loadObj(path, name))
+				} else if (type === 'hdr') {
+					promises.push(this.loadHDR(path, name))
 				}
 			}
 
@@ -191,13 +193,19 @@ class LoaderManager {
 		})
 	}
 
-	async loadHDR() {
-		this.loaderHDR = this.loaderHDR || new UltraHDRLoader()
-		this.loaderHDR.load('/hdr/spruit_sunrise_512.hdr.jpg', (texture) => {
-			texture.mapping = EquirectangularReflectionMapping
+	loadHDR(url, name) {
+		return new Promise((resolve) => {
+			this.loaderHDR = this.loaderHDR || new UltraHDRLoader()
+			this.loaderHDR.load(url, (texture) => {
+				texture.mapping = EquirectangularReflectionMapping
+
+				this.assets[name] = texture
+
+				resolve(texture)
 			// stage3d.scene.environment = texture
 			// stage3d.scene.environmentIntensity = 0.15
 			// stage3d.render()
+			})
 		})
 	}
 }

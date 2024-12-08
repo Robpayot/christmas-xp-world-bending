@@ -33,6 +33,11 @@ export default {
 			name: 'santa_sleight',
 			type: 'gltf',
 			path: './models/santa_sleight.glb'
+		},
+		{
+			name: 'hdrMap',
+			type: 'hdr',
+			path: './img/hdr/spruit_sunrise_512.hdr.jpg'
 		}
 	],
 }

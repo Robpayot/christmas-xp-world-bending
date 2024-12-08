@@ -1,5 +1,5 @@
 import { Mesh, MeshBasicMaterial, MeshMatcapMaterial, Object3D, PlaneGeometry, TextureLoader } from 'three'
-import { color, MeshLambertNodeMaterial, MeshNormalNodeMaterial } from 'three/webgpu'
+import { color, MeshLambertNodeMaterial, MeshNormalNodeMaterial, MeshStandardNodeMaterial } from 'three/webgpu'
 import { vertexBendNode } from '../tsl/utils'
 import SETTINGS from '../views/settings'
 
@@ -28,7 +28,7 @@ export default class Floor extends Object3D {
 	}
 
 	_createMaterial() {
-		this.material = new MeshLambertNodeMaterial({ wireframe: false, color: 'white' })
+		this.material = new MeshStandardNodeMaterial({ wireframe: false, color: 'white' })
 
 		this.material.vertexNode = vertexBendNode()
 		// this.material = new MeshBasicMaterial({ color:'red' })

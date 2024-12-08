@@ -14,7 +14,6 @@ export default class Sphere extends Object3D {
 	}
 	constructor({ debug }) {
 		super()
-		console.log('ici')
 		this.debug = debug
 
 		this._createMaterial()

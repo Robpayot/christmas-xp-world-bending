@@ -3,6 +3,8 @@
 // Modules
 import Debugger from '@/js/managers/Debugger'
 
+import LoaderManager from '@/js/managers/LoaderManager'
+
 // Cameras
 import MainCamera from '../cameras/MainCamera'
 import CameraManager from '../managers/CameraManager'
@@ -39,7 +41,7 @@ export default class MainView {
 	components
 	debugFolder
 	lightDeviceSettings = {
-		ambientColor: '#b4b4b4',
+		ambientColor: '#848484',
 		sunColor: '#a5a5b6'
 	}
 	skyDeviceSettings = {
@@ -169,12 +171,16 @@ export default class MainView {
 	}
 
 	_createLights() {
-		const sun = new DirectionalLight(this.lightDeviceSettings.sunColor, 5)
+		const sun = new DirectionalLight(this.lightDeviceSettings.sunColor, 2.3)
 		const ambient = new AmbientLight(this.lightDeviceSettings.ambientColor, 0.7) // Soft white light
 		// there is an inversion on Decor X --> Y / Y --> X / Z --> Z
-		sun.position.set(-56, 36, -12)   // Position the sun
+		sun.position.set(-56, 33, -12)   // Position the sun
 		this.scene.add(ambient)
 		this.scene.add(sun)
+
+		// env
+		this.scene.environment = LoaderManager.get('hdrMap')
+		this.scene.environmentIntensity = 0.10
 
 		return { sun, ambient }
 	}
@@ -249,13 +255,17 @@ export default class MainView {
 
 		const debugFolder = Debugger.addFolder({ title: `Scene ${this.config.name}`, expanded: true })
 
-		debugFolder.addBinding(this.lights.sun, "position")
+		debugFolder.addBinding(this.lights.sun, "position", { label: 'sun Position' })
+		debugFolder.addBinding(this.lights.sun, "intensity", { label: 'sun Intensity' })
+
 		debugFolder.addBinding(this.lightDeviceSettings, "ambientColor").on('change', () => {
 			this.lights.ambient.color = new Color(this.lightDeviceSettings.ambientColor)
 		})
 		debugFolder.addBinding(this.lightDeviceSettings, "sunColor").on('change', () => {
 			this.lights.sun.color = new Color(this.lightDeviceSettings.sunColor)
 		})
+
+		debugFolder.addBinding(this.scene, "environmentIntensity", { label: 'HDR Intensity' })
 
 		const debugSky = Debugger.addFolder({ title: `Scene sky`, expanded: true })
 
