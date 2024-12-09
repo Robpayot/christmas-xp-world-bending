@@ -42,7 +42,7 @@ export default class MainView {
 	debugFolder
 	lightDeviceSettings = {
 		ambientColor: '#848484',
-		sunColor: '#a5a5b6'
+		sunColor: '#e2e2f0'
 	}
 	skyDeviceSettings = {
 		uRangeA: uniform(0.22),
