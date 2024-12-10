@@ -16,13 +16,35 @@
     <meta name="author" content="robin payot, robpayot@gmail.com" />
     <meta name="developer" content="" />
     <link rel="canonical" href="https://robpayot.github.io/vite-2d-shader-template/dist/" /> -->
-    <script type="module" crossorigin src="/christmas-xp-world-bending/assets/index-116ebba6.js"></script>
-    <link rel="stylesheet" href="/christmas-xp-world-bending/assets/index-aa2a13c5.css">
+    <script type="module" crossorigin src="/christmas-xp-world-bending/assets/index-6424ed3e.js"></script>
+    <link rel="stylesheet" href="/christmas-xp-world-bending/assets/index-19836764.css">
   </head>
   <body>
     <main>
-      <canvas class="scene"></canvas>
+      <canvas data-scene class="scene"></canvas>
       <h1></h1>
+      <div data-loader class="loader">
+        <p class="loader__text">Loading...</p>
+      </div>
+      <div data-ui class="ui">
+        <div class="ui__scrollTo">Scroll to bend the world</div>
+        <div class="ui__btn">
+          <div class="ui__btn__inner" data-ui-btn><span>i</span></div>
+        </div>
+        <div class="ui__popin" data-ui-popin>
+          <h2>Merry Christmas XP!</h2>
+          <p>This demo is powered by <span class="webg">WebGPU</span> thanks to the TSL language made by Three.js</p>
+          <p>
+            Using BatchedMesh, all the decors are drawn in only 1 mesh, 1 material and 1 drawcall. So even if there are
+            multiple geometries (trees, houses, rocks ect...) everything is in one mesh which can improve a lot the
+            performance.
+          </p>
+          <p>My name is Robin Payot, a creative developer making immersive websites since 2015.</p>
+          <p>Youtube</p>
+          <p>X</p>
+          <p>Github</p>
+        </div>
+      </div>
     </main>
   </body>
 </html>
