@@ -2,6 +2,7 @@
 import WebGPUApp from './WebGPUApp'
 import LoaderManager from './managers/LoaderManager'
 import UILoader from './ui/Loader'
+import UIPopin from './ui/Popin'
 import DeviceSettings from './utils/DeviceSettings'
 import config from './views/config'
 
@@ -18,6 +19,9 @@ import config from './views/config'
 	const canvas = document.querySelector('[data-scene]')
 
 	new WebGPUApp({ canvas, isDevelopment: true })
+
+	const uiEl = document.querySelector('[data-ui]')
+	new UIPopin(uiEl)
 
 	loader.loaded()
 

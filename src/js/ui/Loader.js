@@ -29,6 +29,11 @@ export default class UILoader {
 
 		this.animate()
 
+		if (import.meta.env.MODE === 'development') {
+			this.el.classList.add('hide')
+		} else if (import.meta.env.MODE === 'production') {
+		}
+
 	}
 
 	animate() {

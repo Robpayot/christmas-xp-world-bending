@@ -89,7 +89,7 @@ export default class Stars extends Object3D {
 			vertices.push(x, rotatedY, rotatedZ)
 
 			// Randomize offsets and speeds
-			const scale = randFloat(1, 2.5)
+			const scale = randFloat(1.5, 3)
 			scales.push(scale)
 
 			const speed = randFloat(0.5, 1)

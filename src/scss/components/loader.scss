@@ -19,6 +19,7 @@
     // opacity: 0;
     transform: translateY(-100%);
     transition: transform 1.3s var(--ease-in-out-quart);
+    pointer-events: none;
 
     .loader__text {
       opacity: 0;
