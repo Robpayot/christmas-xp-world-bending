@@ -82,6 +82,7 @@ class BendManager {
 	getDelta = (e) => {
 		const direction = (e.deltaY && e.deltaY < 0) || e.detail < 0 || e.wheelDelta > 0 ? -1 : 1
 		const delta = e.detail || e.wheelDelta || e.deltaY
+		console.log(delta)
 
 		return {
 			direction: delta === 0 && e.deltaY === 0 ? 0 : direction,
@@ -112,7 +113,9 @@ class BendManager {
 
 		if (isFirefox) { deltaData.delta *= FIREFOX_DELTA_MULTIPLIER }
 		if (isSafari) { deltaData.delta *= SAFARI_DELTA_MULTIPLIER }
-		if (isMac) { deltaData.delta *= 0.15 }
+		if (isMac) { deltaData.delta *= 0.15 } else {
+			deltaData.delta *= 0.35
+		}
 
 		if (this.singleEventMode) {
 			if (now - this.lastTime > TIME_THRESHOLD) {
