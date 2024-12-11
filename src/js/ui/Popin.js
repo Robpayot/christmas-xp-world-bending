@@ -57,7 +57,7 @@ export default class UIPopin {
 
 	animateText() {
 		this.tl?.kill()
-		this.tl = gsap.timeline({ delay: 0 })
+		this.tl = gsap.timeline({ delay: 0.2 })
 
 		this.tl.fromTo(
 			this.title.children,
@@ -69,7 +69,7 @@ export default class UIPopin {
 				scale: 1,
 				opacity: 1,
 				ease: 'power3.out',
-				duration: 0.8,
+				duration: 1,
 				stagger: 0.02,
 			},
 		)
@@ -86,7 +86,7 @@ export default class UIPopin {
 				ease: 'power3.out',
 				duration: 0.8,
 			},
-			0.2
+			0.4
 		)
 		this.tl.fromTo(
 			this.footer,
@@ -100,7 +100,7 @@ export default class UIPopin {
 				ease: 'power3.out',
 				duration: 0.8,
 			},
-			0.4
+			0.6
 		)
 
 		this.tl.play()

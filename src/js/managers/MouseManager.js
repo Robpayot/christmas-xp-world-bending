@@ -1,6 +1,7 @@
 import Debugger from '@/js/managers/Debugger'
 import { lerp, clamp } from 'three/src/math/MathUtils.js'
 import { roundTo } from '../utils/math'
+import { isTouch } from '../utils/isTouch'
 
 class MouseManager {
 	lerp = 0.015
@@ -18,8 +19,13 @@ class MouseManager {
 		this._createDebug()
 
 		this._handleResize()
-		window.addEventListener('mousemove',  this._handleMouseMove, { passive: false })
 		window.addEventListener('resize',  this._handleResize, { passive: false })
+
+		if (isTouch()) {
+			window.addEventListener('touchmove',  this._handleTouchMove, { passive: false })
+		} else {
+			window.addEventListener('mousemove',  this._handleMouseMove, { passive: false })
+		}
 
 	}
 
@@ -59,6 +65,14 @@ class MouseManager {
 	_handleMouseMove = (e) => {
 		this.targetX = (e.clientX / this.w - 0.5) * 2
 		this.targetY = -(e.clientY / this.h - 0.5) * 2
+
+		this.currentEvent = e
+		return false
+	}
+
+	_handleTouchMove = (e) => {
+		this.targetX = (e.touches[0].clientX / this.w - 0.5) * 2
+		this.targetY = -(e.touches[0].clientY / this.h - 0.5) * 2
 
 		this.currentEvent = e
 		return false

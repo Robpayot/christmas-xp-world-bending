@@ -243,8 +243,6 @@ export default class Winds extends Object3D {
 			mesh.position.x = randFloat(1, 3) * (index + 1) * dir
 			mesh.position.z = randFloat(-3, -1)
 
-			console.log(mesh.position.x)
-
 			// mesh.rotation.x = randFloat(-1, -1)
 
 		})
@@ -255,7 +253,7 @@ export default class Winds extends Object3D {
 			},
 			{
 				value: 1,
-				duration: 8,
+				duration: 6,
 			}
 		)
 	}

@@ -20,10 +20,24 @@
     text-shadow: 2px 2px 6px #dff1ff;
     white-space: nowrap;
     z-index: 1000;
+
+    @include respond-to(smartphone) {
+      font-size: 7vw;
+      top: 86%;
+    }
   }
 
   &__btn {
     --size: 76px;
+    @include respond-to(smartphone) {
+      --size: 60px;
+      --size: 60px;
+      top: 50px;
+      left: auto;
+      right: 20px;
+      font-size: 34px;
+      box-shadow: 0 0 20px 1px #ffffff;
+    }
     font-size: 40px;
     position: absolute;
     left: 50px;
@@ -89,6 +103,12 @@
     flex-direction: column;
     justify-content: space-between;
 
+    @include respond-to(smartphone) {
+      max-width: calc(100vw - 40px);
+      width: 100%;
+      padding: 30px;
+    }
+
     &.show {
       opacity: 1;
       pointer-events: auto;
@@ -101,6 +121,10 @@
       text-align: center;
       // margin-bottom: 40px;
       white-space: pre-wrap;
+
+      @include respond-to(smartphone) {
+        font-size: 28px;
+      }
     }
 
     p {
@@ -110,6 +134,11 @@
       font-size: 18px;
       line-height: 1.4em;
       text-align: center;
+
+      @include respond-to(smartphone) {
+        font-size: 16px;
+        text-align: left;
+      }
     }
   }
 
@@ -175,8 +204,8 @@
       }
 
       @include respond-to(smartphone) {
-        width: 18px;
-        height: 18px;
+        min-width: 40px;
+        height: 40px;
       }
 
       path {

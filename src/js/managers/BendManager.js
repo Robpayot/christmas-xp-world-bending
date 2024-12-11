@@ -3,6 +3,7 @@ import Debugger from '@/js/managers/Debugger'
 import { lerp, clamp } from 'three/src/math/MathUtils.js'
 import { roundTo } from '../utils/math'
 import { isFirefox, isMac, isSafari } from '../utils/detect'
+import { isTouch } from '../utils/isTouch'
 
 const FIREFOX_DELTA_MULTIPLIER = 0.9
 const SAFARI_DELTA_MULTIPLIER = 0.9
@@ -27,6 +28,9 @@ class BendManager {
 		delta: 0
 	}
 	santaPos = new Vector3()
+	touchStartY = 0
+	touchY = 0
+	touchDeltaY = 0
 
 	// negCoef = uniform(1)
 	constructor() {
@@ -35,6 +39,14 @@ class BendManager {
 		// window.addEventListener('DOMMouseScroll', this._handleScroll, false) // for Firefox
 		window.addEventListener('wheel',  this._handleWheelEvent, { passive: false })
 		this.h1 = document.querySelector('h1')
+
+		if (isTouch()) {
+			window.addEventListener("touchstart", this._handleTouchStart)
+			window.addEventListener("touchmove", this._handleTouchMove)
+			window.addEventListener("touchend", this._handleTouchEnd)
+			this.isTouch = true
+			this.maxBend = 10
+		}
 
 	}
 
@@ -82,19 +94,40 @@ class BendManager {
 	getDelta = (e) => {
 		const direction = (e.deltaY && e.deltaY < 0) || e.detail < 0 || e.wheelDelta > 0 ? -1 : 1
 		const delta = e.detail || e.wheelDelta || e.deltaY
-		console.log(delta)
+		// console.log(delta)
 
 		return {
 			direction: delta === 0 && e.deltaY === 0 ? 0 : direction,
-			delta,
+			delta: this.isTouch ? this.touchDeltaY : delta,
 			original: e,
 		}
 	}
 
+	// touch events
+	_handleTouchStart = (e) => {
+		this.touchStartY = e.touches[0].clientY
+	}
+	_handleTouchMove = (e) => {
+		this.currentEvent = e
+		// Calculate the delta as the difference between the current touch position and the start
+		this.touchY = e.touches[0].clientY
+		this.touchDeltaY = this.touchY - this.touchStartY
+
+		// Update the touchStartY to continue detecting scrolling for longer swipes
+		this.touchStartY = this.touchY
+
+		// Prevent the default scrolling behavior if necessary
+		// e.preventDefault()
+	}
+
+	_handleTouchEnd = () => {
+	// Reset values when the touch ends
+		this.touchStartY = 0
+		this.touchY = 0
+	}
+
 	update({ time, delta }) {
-
 		this.targetBend =  Math.max(0, lerp(this.targetBend, Math.abs(this.deltaData.delta), this.lerp))
-
 		this.bend.value = clamp(this.targetBend * this.scrollCoef, 0, this.maxBend)
 		// increase speed
 		this.speed = this.initSpeed + this.targetBend / this.speedCoef
@@ -111,10 +144,14 @@ class BendManager {
 		const now = Date.now()
 		const deltaData = this.currentEvent ? this.getDelta(this.currentEvent) : this.getDelta(this.previousEvent)
 
-		if (isFirefox) { deltaData.delta *= FIREFOX_DELTA_MULTIPLIER }
-		if (isSafari) { deltaData.delta *= SAFARI_DELTA_MULTIPLIER }
-		if (isMac) { deltaData.delta *= 0.15 } else {
-			deltaData.delta *= 0.35
+		if (this.isTouch) {
+			deltaData.delta *= 2
+		} else {
+			if (isFirefox) { deltaData.delta *= FIREFOX_DELTA_MULTIPLIER }
+			if (isSafari) { deltaData.delta *= SAFARI_DELTA_MULTIPLIER }
+			if (isMac) { deltaData.delta *= 0.15 } else {
+				deltaData.delta *= 0.35
+			}
 		}
 
 		if (this.singleEventMode) {
