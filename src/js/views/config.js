@@ -37,7 +37,7 @@ export default {
 		{
 			name: 'hdrMap',
 			type: 'hdr',
-			path: './img/hdr/spruit_sunrise_512.hdr.jpg'
+			path: './img/hdr/kloppenheim_02_1k.jpg'
 		}
 	],
 }

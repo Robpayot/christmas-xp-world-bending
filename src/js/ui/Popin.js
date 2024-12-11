@@ -16,18 +16,94 @@ export default class UIPopin {
 
 		this.btn = this.el.querySelector('[data-ui-btn]')
 		this.popin = this.el.querySelector('[data-ui-popin]')
+		this.block = this.el.querySelector('[data-ui-block]')
+		this.footer = this.el.querySelector('[data-ui-footer]')
+
+		this.title = this.el.querySelector('h2')
+		const chars = this.title.innerHTML
+
+		this.title.innerHTML = ''
+
+		for (let i = 0; i < chars.length; i++) {
+			const char = chars[i]
+			const span = document.createElement('span')
+			span.classList.add('char-anim')
+			span.innerHTML = char
+			this.title.appendChild(span)
+		}
 
 		this.btn.addEventListener('click', this.toggle)
 
+		window.addEventListener('click', this.close)
+		this.popin.addEventListener('click', (e) => e.stopPropagation())
+
 	}
 
-	toggle = () => {
+	toggle = (e) => {
+		e.stopPropagation()
 		if (this.popin.classList.contains('show')) {
 			this.popin.classList.remove('show')
 		} else {
+			// animate text
 			this.popin.classList.add('show')
+			this.animateText()
 
 		}
+	}
+
+	close = () => {
+		this.popin.classList.remove('show')
+	}
+
+	animateText() {
+		this.tl?.kill()
+		this.tl = gsap.timeline({ delay: 0 })
+
+		this.tl.fromTo(
+			this.title.children,
+			{
+				scale: 0,
+				opacity: 0,
+			},
+			{
+				scale: 1,
+				opacity: 1,
+				ease: 'power3.out',
+				duration: 0.8,
+				stagger: 0.02,
+			},
+		)
+
+		this.tl.fromTo(
+			this.block,
+			{
+				opacity: 0,
+				y: 20
+			},
+			{
+				opacity: 1,
+				y: 0,
+				ease: 'power3.out',
+				duration: 0.8,
+			},
+			0.2
+		)
+		this.tl.fromTo(
+			this.footer,
+			{
+				opacity: 0,
+				y: 20
+			},
+			{
+				opacity: 1,
+				y: 0,
+				ease: 'power3.out',
+				duration: 0.8,
+			},
+			0.4
+		)
+
+		this.tl.play()
 	}
 
 	// animate() {

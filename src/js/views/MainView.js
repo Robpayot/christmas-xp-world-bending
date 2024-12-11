@@ -180,7 +180,7 @@ export default class MainView {
 
 		// env
 		this.scene.environment = LoaderManager.get('hdrMap')
-		this.scene.environmentIntensity = 0.10
+		this.scene.environmentIntensity = 0.15
 
 		return { sun, ambient }
 	}
