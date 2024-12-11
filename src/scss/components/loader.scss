@@ -34,5 +34,6 @@
 
   .char-anim {
     display: inline-block;
+    will-change: transform;
   }
 }

@@ -4,6 +4,7 @@ import { CircleGeometry, Matrix4, MeshBasicNodeMaterial, MeshNormalNodeMaterial,
 import BendManager from '../managers/BendManager'
 import MouseManager from '../managers/MouseManager'
 import { lerp } from 'three/src/math/MathUtils.js'
+import { physicalToStandardMatNode } from '../tsl/physicalToStandard'
 // import { Z_DISAPPEAR } from '../managers/TilesManager'
 
 export default class Santa extends Group {
@@ -40,8 +41,8 @@ export default class Santa extends Group {
 		this._createDebugFolder()
 
 		for (let i = 0; i < this.mesh.children.length; i++) {
+			// todo replace all mats
 			const child = this.mesh.children[i]
-			console.log(child)
 			// child.material = physicalToStandardMatNode(child.material)
 			// this.add(child)
 

@@ -32,6 +32,7 @@ import Santa from '../components/Santa'
 import MouseManager from '../managers/MouseManager'
 import Horizon from '../components/Horizon'
 import Stars from '../components/Stars'
+import Winds from '../components/Winds'
 
 export default class MainView {
 	config
@@ -147,6 +148,7 @@ export default class MainView {
 		components.presents = this._addComp(Presents)
 		components.santa = this._addComp(Santa)
 		components.stars = this._addComp(Stars)
+		components.winds = this._addComp(Winds)
 
 		return components
 	}

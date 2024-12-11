@@ -45,7 +45,6 @@ export default class MainCamera {
 	}
 
 	show() {
-		console.log('show')
 		this._showDebug()
 	}
 

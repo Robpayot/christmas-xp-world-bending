@@ -1,8 +1,7 @@
 
 import { degToRad } from 'three/src/math/MathUtils'
 import { randFloat } from 'three/src/math/MathUtils'
-import { Fn } from 'three/webgpu'
-import { NodeMaterial, Object3D, Float32BufferAttribute, Points, BufferGeometry, SpriteNodeMaterial, storage, StorageInstancedBufferAttribute, vec4, mix, uv, vec3, InstancedMesh, PlaneGeometry } from 'three/webgpu'
+import { NodeMaterial, Object3D, Fn, Float32BufferAttribute, Points, BufferGeometry, SpriteNodeMaterial, storage, StorageInstancedBufferAttribute, vec4, mix, uv, vec3, InstancedMesh, PlaneGeometry } from 'three/webgpu'
 import { uvCircleNode } from '../tsl/utils'
 
 export default class Stars extends Object3D {
@@ -36,7 +35,7 @@ export default class Stars extends Object3D {
 		// const rangeSize = range(0.1, 0.2) // random size
 		// material.scaleNode = rangeSize.mul(this.uSize).mul(this.uShow)
 
-		const { aPosition, aScale, aSpeed } = this.geoAttributes
+		const { aPosition, aScale } = this.geoAttributes
 
 		// Position
 
@@ -67,7 +66,6 @@ export default class Stars extends Object3D {
 	_createGeometry() {
 		const vertices = []
 		const scales = []
-		const speeds = []
 
 		const radius = 1000 // Radius of the sphere
 
@@ -91,20 +89,15 @@ export default class Stars extends Object3D {
 			// Randomize offsets and speeds
 			const scale = randFloat(1.5, 3)
 			scales.push(scale)
-
-			const speed = randFloat(0.5, 1)
-			speeds.push(speed)
 		}
 
 		// add attributes
 
 		const aPosition = storage(new StorageInstancedBufferAttribute(new Float32Array(vertices), 3), 'vec3', this.count).toAttribute()
 		const aScale = storage(new StorageInstancedBufferAttribute(new Float32Array(scales), 1), 'float', this.count).toAttribute()
-		const aSpeed = storage(new StorageInstancedBufferAttribute(new Float32Array(speeds), 1), 'float', this.count).toAttribute()
 
 		this.geoAttributes.aPosition = aPosition
 		this.geoAttributes.aScale = aScale
-		this.geoAttributes.aSpeed = aSpeed
 		// const mesh = new Points(geometry, this.material)
 		// mesh.position.y = 1
 

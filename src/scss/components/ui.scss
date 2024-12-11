@@ -61,6 +61,7 @@
 
   .char-anim {
     display: inline-block;
+    will-change: transform;
   }
 
   &__popin {
@@ -82,7 +83,7 @@
     opacity: 0;
     pointer-events: none;
     transform: translate(-50%, -50%) translateY(50vh);
-    transition: opacity 0.3s ease, transform 1s var(--ease-out-bounce2);
+    transition: opacity 0.1s ease, transform 1s var(--ease-out-bounce2) 0.4s;
 
     display: flex;
     flex-direction: column;
@@ -92,6 +93,7 @@
       opacity: 1;
       pointer-events: auto;
       transform: translate(-50%, -50%);
+      transition: opacity 0.2s ease, transform 1s var(--ease-out-bounce2);
     }
 
     h2 {
@@ -107,6 +109,7 @@
       margin-bottom: 20px;
       font-size: 18px;
       line-height: 1.4em;
+      text-align: center;
     }
   }
 

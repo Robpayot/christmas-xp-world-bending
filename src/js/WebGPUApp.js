@@ -60,7 +60,7 @@ export default class WebGPUApp {
 
 		this._events(true)
 		requestAnimationFrame(this._tick)
-		document.addEventListener('visibilitychange', this._visibilityChangeHandler)
+		// document.addEventListener('visibilitychange', this._visibilityChangeHandler)
 		this._resize()
 	}
 
@@ -68,7 +68,7 @@ export default class WebGPUApp {
 		this._removeDebug()
 		this._removeStats()
 		this._events(false)
-		document.removeEventListener('visibilitychange', this._visibilityChangeHandler)
+		// document.removeEventListener('visibilitychange', this._visibilityChangeHandler)
 		this.activeView?.destroy()
 		this.composer?.destroy()
 		this.renderer.destroy()

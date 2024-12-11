@@ -73,7 +73,6 @@ class TilesManager {
 	}
 
 	updateUnivers() {
-		console.log('update unvie', this.current, this.stepUnivers)
 		if (this.current % this.stepUnivers === 0) { // every 3, TODO: better random
 
 			// change univers
