@@ -176,7 +176,7 @@ export default class Winds extends Object3D {
 
 		material.transparent = true
 		material.side = DoubleSide
-		material.depthWrite = false
+		// material.depthWrite = false
 		material.depthTest = false
 		material.needsUpdate = true
 
@@ -189,6 +189,7 @@ export default class Winds extends Object3D {
 		// mesh.scale.setScalar(0.5 + Math.random());
 		// mesh.scale.y = Math.random() * 0.2 + 0.9;
 		const s = 2
+		mesh.renderOrder = 1
 
 		// if (index === 0) {
 		// 	s = 10

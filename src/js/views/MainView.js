@@ -143,12 +143,12 @@ export default class MainView {
 		// this.scene.add(ResourceLoader.get('watercolor/scene').scene)
 		// components.sphere = this._addComp(Sphere)
 		components.floor = this._addComp(Floor)
+		components.winds = this._addComp(Winds)
 		components.horizon = this._addComp(Horizon)
 		components.decor = this._addComp(Decor)
 		components.presents = this._addComp(Presents)
 		components.santa = this._addComp(Santa)
 		components.stars = this._addComp(Stars)
-		components.winds = this._addComp(Winds)
 
 		return components
 	}
