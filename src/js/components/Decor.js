@@ -1,11 +1,13 @@
-import { BatchedMesh, Group, MathUtils, Mesh, MeshBasicMaterial, MeshMatcapMaterial, Object3D, PlaneGeometry, TextureLoader } from 'three'
 import LoaderManager from '@/js/managers/LoaderManager'
-import { CircleGeometry, Matrix4, MeshNormalNodeMaterial, MeshStandardNodeMaterial, transformNormalToView, varying, vec3, Vector3 } from 'three/webgpu'
+import {  Matrix4, transformNormalToView, varying, vec3, Vector3, BatchedMesh, Group, MathUtils, Object3D } from 'three/webgpu'
 import { fragmentFogNode, vertexBendBatchedNode, vertexBendNode } from '../tsl/utils'
 import { physicalToStandardMatNode } from '../tsl/physicalToStandard'
-import TilesManager, { TILE_SIZE, TILE_WIDE } from '../managers/TilesManager'
 import BendManager from '../managers/BendManager'
+import SETTINGS from '../views/settings'
 // import { Z_DISAPPEAR } from '../managers/TilesManager'
+
+const TILE_SIZE = SETTINGS.world.size // 200
+const TILE_WIDE = SETTINGS.isMobile ? SETTINGS.world.mobileWide : SETTINGS.world.wide // 200
 
 export default class Decor extends Group {
 	material
@@ -16,7 +18,7 @@ export default class Decor extends Group {
 	}
 	instances = []
 	decorGeos = []
-	nbDecor = 3000
+	nbDecor = SETTINGS.isMobile ? 400 : 3000
 	totalGeo = 0
 	totalInstance = 0
 	speed = 0.015

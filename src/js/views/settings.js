@@ -10,8 +10,11 @@ const SETTINGS = {
 		far: 1020,
 	},
 	world: {
-		size: 200
-	}
+		size: 200,
+		wide: 100,
+		mobileWide: 30
+	},
+	isMobile: window.innerWidth < 768
 }
 
 export default SETTINGS

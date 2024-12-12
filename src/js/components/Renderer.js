@@ -1,14 +1,11 @@
 // Vendor
-import {
-	ACESFilmicToneMapping,
+import { WebGPURenderer, 	ACESFilmicToneMapping,
 	CineonToneMapping,
 	Color,
 	LinearToneMapping,
 	NoToneMapping,
 	ReinhardToneMapping,
-	SRGBColorSpace,
-} from 'three'
-import { WebGPURenderer } from 'three/webgpu'
+	SRGBColorSpace } from 'three/webgpu'
 
 // import WebGPU from 'three/addons/capabilities/WebGPU.js'
 
@@ -65,10 +62,11 @@ export default class Renderer {
 		// Currently sortObjects and perObjectFrustumCulled currently have bugs in WebGPU so disabled it.
 		// sortObjects.value = true//!this.isWebGPU
 		// perObjectFrustumCulled.value = true// !this.isWebGPU
+		this.webGPU = !window.navigator.gpu ? false : true
 
 		const renderer = new WebGPURenderer({
 			canvas: this.#canvas,
-			antialias: true,
+			antialias: this.webGPU ? true : false,
 			// alpha: false,
 		})
 		await renderer.init()

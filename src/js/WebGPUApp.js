@@ -24,7 +24,8 @@ export default class WebGPUApp {
 	composer
 	activeView
 	lastTime = 0
-	constructor({ canvas, isDevelopment }) {
+	constructor({ canvas, isDevelopment, isReady }) {
+		this.isReady = isReady
 		// Options
 		this.canvas = canvas
 		this.isDevelopment = isDevelopment
@@ -52,7 +53,6 @@ export default class WebGPUApp {
 	afterInit = () => {
 		if (this.isDevelopment) {
 			this.stats = this._createStats()
-			console.log(this.stats)
 		}
 
 		this._initViews()
@@ -62,6 +62,7 @@ export default class WebGPUApp {
 		requestAnimationFrame(this._tick)
 		// document.addEventListener('visibilitychange', this._visibilityChangeHandler)
 		this._resize()
+		this.isReady()
 	}
 
 	destroy() {

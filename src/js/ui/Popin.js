@@ -37,6 +37,14 @@ export default class UIPopin {
 		window.addEventListener('click', this.close)
 		this.popin.addEventListener('click', (e) => e.stopPropagation())
 
+		this.webGPU = !window.navigator.gpu ? false : true
+
+		const webgl = this.el.querySelector('.webg')
+
+		if (!this.webGPU) {
+			webgl.innerHTML = 'WebGL'
+		}
+
 	}
 
 	toggle = (e) => {

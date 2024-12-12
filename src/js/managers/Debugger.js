@@ -146,8 +146,8 @@ class Debugger {
 	}
 }
 
-// let debuggerInstance = null
-// if (GLOBAL.isClient && GLOBAL.isDevelopment) {
-//   debuggerInstance = new Debugger()
-// }
-export default new Debugger()
+let debuggerInstance = null
+if (import.meta.env.MODE === 'development') {
+	debuggerInstance = new Debugger()
+}
+export default debuggerInstance

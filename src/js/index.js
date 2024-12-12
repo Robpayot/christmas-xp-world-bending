@@ -12,17 +12,25 @@ import config from './views/config'
 	const loaderEl = document.querySelector('[data-loader]')
 	const loader = new UILoader(loaderEl)
 
+	function isWebGPUSupported() {
+		if (!navigator.gpu) {
+			console.warn("WebGPU is not supported on this device or browser.")
+			return false
+		}
+		return true
+	}
+
 	// scene
 	await DeviceSettings.init()
 	await LoaderManager.load([...config.resources])
 
 	const canvas = document.querySelector('[data-scene]')
 
-	new WebGPUApp({ canvas, isDevelopment: true })
+	new WebGPUApp({ canvas, isDevelopment: true, isReady: () => {
+		loader.loaded()
+	} })
 
 	const uiEl = document.querySelector('[data-ui]')
 	new UIPopin(uiEl)
-
-	loader.loaded()
 
 })()

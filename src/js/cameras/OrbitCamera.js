@@ -1,5 +1,5 @@
 // Vendor
-import { PerspectiveCamera, Vector3 } from 'three'
+import { PerspectiveCamera, Vector3 } from 'three/webgpu'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import BendManager from '../managers/BendManager'
 import { lerp } from 'three/src/math/MathUtils.js'

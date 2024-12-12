@@ -23,7 +23,8 @@
 
     @include respond-to(smartphone) {
       font-size: 7vw;
-      top: 86%;
+      top: auto;
+      bottom: 120px;
     }
   }
 

@@ -1,10 +1,10 @@
 export function isTouch() {
-	if ('standalone' in navigator) {
-		return true // iOS devices
-	}
+	// if ('standalone' in navigator) {
+	// 	return true // iOS devices
+	// }
 	const hasCoarse = window.matchMedia('(pointer: coarse)').matches
 	if (hasCoarse) {
-		return true
+		return false
 	}
 	const hasPointer = window.matchMedia('(pointer: fine)').matches
 	if (hasPointer) {
