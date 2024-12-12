@@ -50,7 +50,7 @@ export default class WebGPUApp {
 
 	}
 
-	afterInit = () => {
+	afterInit = (multiDraw) => {
 		if (this.isDevelopment) {
 			this.stats = this._createStats()
 		}
@@ -62,7 +62,7 @@ export default class WebGPUApp {
 		requestAnimationFrame(this._tick)
 		// document.addEventListener('visibilitychange', this._visibilityChangeHandler)
 		this._resize()
-		this.isReady()
+		this.isReady(multiDraw)
 	}
 
 	destroy() {

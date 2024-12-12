@@ -91,6 +91,7 @@
     transform: translate(-50%, -50%);
     color: rgb(255, 255, 255);
     padding: 60px;
+    width: 800px;
     max-width: 90vw;
     height: 70vh;
     z-index: 1001;
@@ -144,6 +145,19 @@
   }
 
   &__block {
+    &.no-multidraw {
+      p {
+        display: none;
+      }
+
+      p.no-multidraw-text {
+        display: inline-block;
+      }
+    }
+    .no-multidraw-text {
+      display: none;
+    }
+
     a {
       font-weight: bold;
       display: inline-block;

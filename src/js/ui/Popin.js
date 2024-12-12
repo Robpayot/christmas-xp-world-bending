@@ -47,7 +47,18 @@ export default class UIPopin {
 
 	}
 
+	noMultiDraw() {
+		this.cantClose = true
+
+		this.block.classList.add('no-multidraw')
+
+		// animate text
+		this.popin.classList.add('show')
+		this.animateText()
+	}
+
 	toggle = (e) => {
+		if (this.cantClose) return
 		e.stopPropagation()
 		if (this.popin.classList.contains('show')) {
 			this.popin.classList.remove('show')
@@ -60,6 +71,7 @@ export default class UIPopin {
 	}
 
 	close = () => {
+		if (this.cantClose) return
 		this.popin.classList.remove('show')
 	}
 

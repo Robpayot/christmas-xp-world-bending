@@ -102,7 +102,13 @@ export default class Renderer {
 
 		this.#instance = renderer
 
-		this.isReady()
+		// check if multidraw supported (Firefox)
+		let multiDraw = true
+		if (renderer.backend.extensions && !renderer.backend.extensions.has('WEBGL_multi_draw')) {
+			multiDraw = false
+		}
+
+		this.isReady(multiDraw)
 	}
 
 	/**
