@@ -27,12 +27,12 @@ export default {
 		{
 			name: 'presents',
 			type: 'gltf',
-			path: './models/presents2.glb'
+			path: './models/presents2_optimized.glb'
 		},
 		{
 			name: 'santa_sleight',
 			type: 'gltf',
-			path: './models/santa_sleight.glb'
+			path: './models/santa_sleight_optimized.glb'
 		},
 		{
 			name: 'hdrMap',
