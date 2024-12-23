@@ -38,7 +38,6 @@ class BendManager {
 
 		// window.addEventListener('DOMMouseScroll', this._handleScroll, false) // for Firefox
 		window.addEventListener('wheel',  this._handleWheelEvent, { passive: false })
-		this.h1 = document.querySelector('h1')
 
 		if (isTouch()) {
 			window.addEventListener("touchstart", this._handleTouchStart)
@@ -174,7 +173,7 @@ class BendManager {
 		// // TODO: fix chrome with no devtool not updateing well the minus scrollResetForce, maybe to small numbers?
 		// this.scrollIncr = Math.max(0, roundTo((this.scrollIncr - this.scrollResetForce * delta) * 1000, 3) / 1000)
 		// this.targetBend =  Math.max(0, lerp(this.targetBend, this.scrollIncr, this.lerp))
-		this.h1.innerHTML = Math.round(this.deltaData.delta)
+		// this.h1.innerHTML = Math.round(this.deltaData.delta)
 
 		// // this.speed = this.initSpeed + this.scrollIncr / this.speedCoef
 		// this.bend.value = clamp(this.targetBend * this.scrollCoef, 0, this.maxBend)

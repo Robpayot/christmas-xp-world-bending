@@ -31,10 +31,11 @@ export default class Winds extends Object3D {
 
 			setTimeout(() => {
 				this.anim(i)
-			}, 3000 * i)
+			}, 3000 * i) // 3000
 		}
 
-		this.position.y = 5
+		this.position.y = 10
+		this.position.z = -40
 
 	}
 
@@ -177,7 +178,7 @@ export default class Winds extends Object3D {
 		material.transparent = true
 		material.side = DoubleSide
 		// material.depthWrite = false
-		material.depthTest = false
+		// material.depthTest = false
 		material.needsUpdate = true
 
 		return material
@@ -188,7 +189,7 @@ export default class Winds extends Object3D {
 		// mesh.rotation.y = Math.random() * 10
 		// mesh.scale.setScalar(0.5 + Math.random());
 		// mesh.scale.y = Math.random() * 0.2 + 0.9;
-		const s = 2
+		const s = 4
 		mesh.renderOrder = 1
 
 		// if (index === 0) {
@@ -240,7 +241,7 @@ export default class Winds extends Object3D {
 			const dir = Math.random() < 0.5 ? -1 : 1
 
 			mesh.position.y = randFloat(0, 2)  * (index + 1)
-			mesh.position.x = randFloat(1, 3) * (index + 1) * dir
+			mesh.position.x = randFloat(1, 3) * (index + 1) * dir * 5
 			mesh.position.z = randFloat(-3, -1)
 
 			// mesh.rotation.x = randFloat(-1, -1)
