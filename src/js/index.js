@@ -1,4 +1,5 @@
 // Test import of a JavaScript module
+import { setTimeout } from 'timers'
 import WebGPUApp from './WebGPUApp'
 import LoaderManager from './managers/LoaderManager'
 import UILoader from './ui/Loader'
@@ -25,7 +26,9 @@ import config from './views/config'
 		if (!multiDraw) {
 			popin.noMultiDraw()
 		}
-		loader.loaded()
+		setTimeout(() => {
+			loader.loaded()
+		}, 1000)
 	} })
 
 })()
