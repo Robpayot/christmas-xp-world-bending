@@ -1,5 +1,4 @@
 // Test import of a JavaScript module
-import { setTimeout } from 'timers'
 import WebGPUApp from './WebGPUApp'
 import LoaderManager from './managers/LoaderManager'
 import UILoader from './ui/Loader'
