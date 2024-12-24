@@ -43,7 +43,7 @@ export default class WebGPUApp {
 		// this._debug = this._createDebug()
 		this.renderer = new Renderer({
 			canvas: this.canvas,
-			isReady: this.afterInit
+			afterInit: this.afterInit
 		})
 
 		// this.composer = this._createComposer()

@@ -20,11 +20,11 @@ export default class Renderer {
 	#debug
 	#debugStats
 	#instance
-	constructor({ canvas, isReady }) {
+	constructor({ canvas, afterInit }) {
 		// Options
 		this.#canvas = canvas
 
-		this.isReady = isReady
+		this.afterInit = afterInit
 
 		// Setup
 		this.#debug = this._createDebug()
@@ -108,7 +108,7 @@ export default class Renderer {
 			multiDraw = false
 		}
 
-		this.isReady(multiDraw)
+		this.afterInit(multiDraw)
 	}
 
 	/**
