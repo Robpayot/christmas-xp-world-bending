@@ -25,9 +25,7 @@ import config from './views/config'
 		if (!multiDraw) {
 			popin.noMultiDraw()
 		}
-		setTimeout(() => {
-			loader.loaded()
-		}, 1000)
+		loader.loaded()
 	} })
 
 })()

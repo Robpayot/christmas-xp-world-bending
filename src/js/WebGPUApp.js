@@ -62,7 +62,10 @@ export default class WebGPUApp {
 		requestAnimationFrame(this._tick)
 		// document.addEventListener('visibilitychange', this._visibilityChangeHandler)
 		this._resize()
-		this.isReady(multiDraw)
+		this.renderer.render()
+		setTimeout(() => {
+			this.isReady(multiDraw)
+		}, 1000)
 	}
 
 	destroy() {
